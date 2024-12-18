@@ -16,6 +16,10 @@ class User:
   email:str
   canvas_id:Optional[int]=None,
   pronouns:str=None
+  
+  @classmethod
+  def from_database(cls, row) -> 'User':
+    return cls(row[0], row[1], row[2], row[3], row[4], row[5])
 
 class Users:
   mydb: mysql.connector.MySQLConnection
@@ -27,7 +31,7 @@ class Users:
       password=self.config.get("MYSQL_USER_PASSWORD"),
       database="fablab"
     )
-    API_URL="https://uncc.instructure.com/"
+    API_URL="https://instructure.charlotte.edu"
     self.canvas = Canvas(API_URL, self.config["CANVAS_API_KEY"])
     self.course = self.canvas.get_course(231237)
     
@@ -74,7 +78,7 @@ class Users:
     cur.execute(statment)
     result = []
     for row in cur.fetchall():
-      result.append(User(row[0], row[1], row[2], row[3], row[4], row[5]))
+      result.append(User.from_database(row))
     return result
   
   def get_all_users(self) -> List[User]:
@@ -131,6 +135,7 @@ class Users:
       cur.execute(statement)
       user.canvas_id = canvasID
       user.pronouns = pronouns
+      self.mydb.commit()
 
 
 
