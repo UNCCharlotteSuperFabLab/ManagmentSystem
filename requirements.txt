@@ -10,12 +10,16 @@ frozenlist==1.5.0
 idna==3.10
 multidict==6.1.0
 mysql-connector-python==9.1.0
+packaging==24.2
 propcache==0.2.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 pytz==2024.2
 requests==2.32.3
 six==1.17.0
+SQLAlchemy==2.0.36
 types-python-dateutil==2.9.0.20241206
+typing_extensions==4.12.2
 urllib3==2.2.3
+wrapt==1.17.0
 yarl==1.18.3
