@@ -23,14 +23,8 @@ class User:
 
 class Users:
   mydb: mysql.connector.MySQLConnection
-  def __init__(self):
-    self.config = dotenv_values("/Users/philip/Projects/fablab/ManagmentSystem/.env")
-    self.mydb = mysql.connector.connect(
-      host="localhost",
-      user="fablab",
-      password=self.config.get("MYSQL_USER_PASSWORD"),
-      database="fablab"
-    )
+  def __init__(self, mysql_connection:mysql.connector.MySQLConnection):
+    self.mydb = mysql_connection
     API_URL="https://instructure.charlotte.edu"
     self.canvas = Canvas(API_URL, self.config["CANVAS_API_KEY"])
     self.course = self.canvas.get_course(231237)
@@ -141,7 +135,14 @@ class Users:
 
 
 if __name__ == "__main__":
-  users = Users()
+  config = dotenv_values("/Users/philip/Projects/fablab/ManagmentSystem/.env")
+  connection = mysql.connector.connect(
+      host="localhost",
+      user="fablab",
+      password=config.get("MYSQL_USER_PASSWORD"),
+      database="fablab"
+    )
+  users = Users(connection)
   users.test_connection()
   #users.add_user(User(801276949, "Philip", "Smith", "psmit145@charlotte.edu"))
   philip = users.find_or_create_user(801276949)
