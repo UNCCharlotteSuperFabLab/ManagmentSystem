@@ -6,14 +6,8 @@ from time import sleep
 from typing import List
 
 class Visits():
-    def __init__(self, user_controller:Users):
-        self.config = dotenv_values("/Users/philip/Projects/fablab/ManagmentSystem/.env")
-        self.mydb = mysql.connector.connect(
-            host="localhost",
-            user="fablab",
-            password=self.config.get("MYSQL_USER_PASSWORD"),
-            database="fablab"
-        )
+    def __init__(self, mysql_connection:mysql.connector.MySQLConnection, user_controller:Users):
+        self.mydb = mysql_connection
         self.user_controller = user_controller
     
     def scan(self, niner_id:int) -> User:
@@ -41,7 +35,14 @@ class Visits():
     
 
 if __name__ == "__main__":
-    visits = Visits(Users())
+    config = dotenv_values("/Users/philip/Projects/fablab/ManagmentSystem/.env")
+    connection = mysql.connector.connect(
+            host="localhost",
+            user="fablab",
+            password=config.get("MYSQL_USER_PASSWORD"),
+            database="fablab"
+        )
+    visits = Visits(connection, Users())
     for i in range(8):
         print(visits.scan(801276949))
         if i % 2 == 0:
