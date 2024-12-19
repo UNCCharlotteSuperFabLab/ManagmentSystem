@@ -14,7 +14,7 @@ from canvasapi.user import User as CanvasUser
 
 
 class SpaceUserManager(BaseUserManager):
-    def create_user(self, niner_id, password=None, **extra_fields):
+    def create_user(self, niner_id, password=None, **extra_fields) -> SpaceUser:
         if not niner_id:
             raise ValueError('The Niner ID must be set')
         user = self.model(niner_id=niner_id, **extra_fields)
@@ -22,12 +22,21 @@ class SpaceUserManager(BaseUserManager):
         user.save()
         return user
 
-    def create_superuser(self, niner_id, password=None, **extra_fields):
+    def create_superuser(self, niner_id, password=None, **extra_fields) -> SpaceUser:
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
         # Create the superuser using the create_user method
         return self.create_user(niner_id, password, **extra_fields)
+
+    def get_or_create(self, niner_id) -> SpaceUser:
+        user = self.filter(niner_id=niner_id).first()
+        if user:
+            return user
+
+        user = self.model(niner_id=niner_id)
+        user.save()
+        return user
 
     
 
