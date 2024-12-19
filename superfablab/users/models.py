@@ -3,6 +3,9 @@ from __future__ import annotations
 import requests
 
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
+
 
 from typing import Dict
 
@@ -10,16 +13,52 @@ from canvasapi import Canvas
 from canvasapi.user import User as CanvasUser
 
 
+class SpaceUserManager(BaseUserManager):
+    def create_user(self, niner_id, password=None, **extra_fields):
+        if not niner_id:
+            raise ValueError('The Niner ID must be set')
+        user = self.model(niner_id=niner_id, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, niner_id, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        # Create the superuser using the create_user method
+        return self.create_user(niner_id, password, **extra_fields)
+
+    
+
 # Create your models here.
-class SpaceUser(models.Model):
+class SpaceUser(AbstractBaseUser, PermissionsMixin):
     niner_id = models.IntegerField(primary_key=True)
+    canvas_id = models.IntegerField(blank=True, null=True)
     first_name = models.TextField(blank=True, null=True)
     last_name = models.TextField(blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
-    canvas_id = models.IntegerField(blank=True, null=True)
+
+    
+    USERNAME_FIELD="niner_id"
+    
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=False)
+    groups = models.ManyToManyField('auth.Group', blank=True)
+    user_permissions = models.ManyToManyField('auth.Permission', blank=True)
+
+    
+    objects = SpaceUserManager()
+    
+    def get_full_name(self) -> str:
+        return f"{self.first_name}, {self.last_name}"
+    
+    def get_short_name(self) -> str:
+        return f"{self.first_name}"
     
     def __str__(self):
-        return f"{self.first_name}, {self.last_name}"
+        return self.get_full_name()
     
     def __repr__(self):
         return f"space_user({self.niner_id}, {self.first_name}, {self.last_name}, {self.email}, {self.canvas_id})" + super().__repr__()
@@ -64,7 +103,5 @@ class SpaceUser(models.Model):
         else:
             self.save()
             return self
-
-
 
 
