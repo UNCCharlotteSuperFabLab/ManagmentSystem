@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'db']
 # Application definition
 
 INSTALLED_APPS = [
+    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -80,8 +81,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'fablab',
-        'USER': 'fablab',
-        'PASSWORD': config['POSTGRESS_USER_PASSWORD'],
+        'USER': 'postgres',
+        'PASSWORD': config['POSTGRESS_ROOT_PASSWORD'],
         'HOST': 'localhost',  # or use the container name if it's in a Docker network
         'PORT': '6543',
     }
