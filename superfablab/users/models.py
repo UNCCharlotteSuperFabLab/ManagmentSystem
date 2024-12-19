@@ -17,6 +17,13 @@ class SpaceUser(models.Model):
     last_name = models.TextField(blank=True)
     email = models.EmailField(blank=True)
     canvas_id = models.IntegerField(blank=True)
+    
+    def __str__(self):
+        return f"{self.first_name}, {self.last_name}"
+    
+    def __repr__(self):
+        return f"space_user({self.niner_id}, {self.first_name}, {self.last_name}, {self.email}, {self.canvas_id})" + super().__repr__()
+    
     def niner_engage_get_updated_values(self, config:Dict[str, str]) -> SpaceUser:
         if self.first_name and self.last_name and self.email:
             if "t" in config.get("VERBOSE_DEBUG", "false").lower(): print(f"Values Already set, shouldnt have run")
@@ -41,7 +48,7 @@ class SpaceUser(models.Model):
 
         return self
     
-    def canvas_get_updated_values(self, config:Dict[str, str]) -> SpaceUser:
+    def get_canvas_id(self, config:Dict[str, str]) -> SpaceUser:
         if self.canvas_id:
             return self
         canvas = Canvas("https://instructure.charlotte.edu", config["CANVAS_API_KEY"])
