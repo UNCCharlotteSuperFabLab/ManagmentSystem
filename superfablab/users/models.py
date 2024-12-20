@@ -5,9 +5,7 @@ import requests
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
-
-
-from typing import Dict
+from typing import Dict, Tuple
 
 from canvasapi import Canvas
 from canvasapi.user import User as CanvasUser
@@ -29,14 +27,14 @@ class SpaceUserManager(BaseUserManager):
         # Create the superuser using the create_user method
         return self.create_user(niner_id, password, **extra_fields)
 
-    def get_or_create(self, niner_id) -> SpaceUser:
+    def get_or_create(self, niner_id) -> Tuple[SpaceUser, bool]:
         user = self.filter(niner_id=niner_id).first()
         if user:
-            return user
+            return (user, False)
 
         user = self.model(niner_id=niner_id)
         user.save()
-        return user
+        return (user, True)
 
     
 
