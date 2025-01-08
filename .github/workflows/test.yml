@@ -1,4 +1,4 @@
-name: Django Tests with Docker Compose
+name: Django Tests
 
 on:
   push:
