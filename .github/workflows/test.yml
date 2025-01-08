@@ -17,6 +17,13 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Set up Docker Compose
+      env:
+            NINER_ENGAGE_COOKIE: ${{ secrets.NINER_ENGAGE_COOKIE }}
+            NINER_ENGAGE_TOKEN: ${{ secrets.NINER_ENGAGE_TOKEN }}
+            NINER_ENGAGE_PAYLOAD_TOKEN: ${{ secrets.NINER_ENGAGE_PAYLOAD_TOKEN }}
+            CANVAS_API_KEY: ${{ secrets.CANVAS_API_KEY }}
+            POSTGRESS_ROOT_PASSWORD: ${{ secrets.POSTGRESS_ROOT_PASSWORD }}
+
       run: |
         docker compose -f docker-compose.yaml up -d
 
