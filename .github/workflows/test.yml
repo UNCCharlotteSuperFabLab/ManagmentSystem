@@ -1,0 +1,57 @@
+name: Django Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Compose
+      env:
+            NINER_ENGAGE_COOKIE: ${{ secrets.NINER_ENGAGE_COOKIE }}
+            NINER_ENGAGE_TOKEN: ${{ secrets.NINER_ENGAGE_TOKEN }}
+            NINER_ENGAGE_PAYLOAD_TOKEN: ${{ secrets.NINER_ENGAGE_PAYLOAD_TOKEN }}
+            CANVAS_API_KEY: ${{ secrets.CANVAS_API_KEY }}
+            POSTGRESS_ROOT_PASSWORD: ${{ secrets.POSTGRESS_ROOT_PASSWORD }}
+
+      run: |
+        docker compose -f docker-compose.yaml up -d
+    
+    - name: Wait for database to be ready
+      env:
+        NINER_ENGAGE_COOKIE: ${{ secrets.NINER_ENGAGE_COOKIE }}
+        NINER_ENGAGE_TOKEN: ${{ secrets.NINER_ENGAGE_TOKEN }}
+        NINER_ENGAGE_PAYLOAD_TOKEN: ${{ secrets.NINER_ENGAGE_PAYLOAD_TOKEN }}
+        CANVAS_API_KEY: ${{ secrets.CANVAS_API_KEY }}
+        POSTGRESS_ROOT_PASSWORD: ${{ secrets.POSTGRESS_ROOT_PASSWORD }}
+
+      run: |
+        for i in {1..60}; do
+        docker compose exec db pg_isready -U fablab && break || sleep 5;
+        done
+
+
+    - name: Run Django tests
+      env:
+        NINER_ENGAGE_COOKIE: ${{ secrets.NINER_ENGAGE_COOKIE }}
+        NINER_ENGAGE_TOKEN: ${{ secrets.NINER_ENGAGE_TOKEN }}
+        NINER_ENGAGE_PAYLOAD_TOKEN: ${{ secrets.NINER_ENGAGE_PAYLOAD_TOKEN }}
+        CANVAS_API_KEY: ${{ secrets.CANVAS_API_KEY }}
+        POSTGRESS_ROOT_PASSWORD: ${{ secrets.POSTGRESS_ROOT_PASSWORD }}
+
+      run: |
+        docker compose exec -T web python manage.py test
+
+    - name: Tear down Docker Compose
+      run: |
+        docker compose down

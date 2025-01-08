@@ -11,9 +11,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from dotenv import dotenv_values
 
-config = dotenv_values("../.env")
+from urllib.parse import urlparse
+
+import os
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -78,17 +81,32 @@ WSGI_APPLICATION = 'superfablab.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fablab',
-        'USER': 'postgres',
-        'PASSWORD': config['POSTGRESS_ROOT_PASSWORD'],
-        'HOST': 'localhost',  # or use the container name if it's in a Docker network
-        'PORT': '6543',
-    }
-}
+DATABASE_URL = os.getenv('DATABASE_URL')
 
+if DATABASE_URL:
+    url = urlparse(DATABASE_URL)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': url.path[1:],  # Remove the leading '/'
+            'USER': url.username,
+            'PASSWORD': url.password,
+            'HOST': url.hostname,
+            'PORT': url.port,
+        }
+    }
+
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'fablab',
+            'USER': 'postgres',
+            'PASSWORD': os.getenv('POSTGRESS_ROOT_PASSWORD'),
+            'HOST': 'db',  # or use the container name if it's in a Docker network
+            'PORT': '5432',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

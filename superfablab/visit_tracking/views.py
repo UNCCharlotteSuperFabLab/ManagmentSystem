@@ -8,9 +8,6 @@ from .forms import NewUserForm
 
 from datetime import timedelta
 
-from dotenv import dotenv_values
-
-
 
 def scan(request):
     if request.method == 'GET' and 'barcode' in request.GET:

@@ -2,20 +2,44 @@ services:
   db:
     image: postgres
     restart: always
-    container_name: postgres
+    container_name: db
     environment:
       POSTGRES_PASSWORD: ${POSTGRESS_ROOT_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data 
-    network_mode: "bridge"
     ports:
-      - 6543:5432
+      - 5432:5432
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "fablab"]
+      interval: 10s
+      retries: 10
+      start_period: 60s  # Give it more time to start
+      timeout: 10s
+
  
   adminer:
     image: adminer
     restart: always
     ports:
       - 8080:8080
+  
+  web:
+    build: .  # This tells Docker Compose to build the image using the Dockerfile in the current directory
+    command: /app/wait-for-it.sh db:5432 -- python manage.py runserver 0.0.0.0:8000
+    restart: always
+    volumes:
+      - ./superfablab:/app
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://postgres:${POSTGRESS_ROOT_PASSWORD}@db:5432/fablab
+      - NINER_ENGAGE_COOKIE=${NINER_ENGAGE_COOKIE}
+      - NINER_ENGAGE_TOKEN=${NINER_ENGAGE_TOKEN}
+      - NINER_ENGAGE_PAYLOAD_TOKEN=${NINER_ENGAGE_PAYLOAD_TOKEN}
+      - CANVAS_API_KEY=${CANVAS_API_KEY}
+    ports:
+      - "8000:8000"
+
  
 volumes:
   pgdata:
