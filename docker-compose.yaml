@@ -1,31 +1,21 @@
-# Use root/example as user/password credentials
 services:
-  mysql:
-    image: mysql
+  db:
+    image: postgres
     restart: always
+    container_name: postgres
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    ports:
-      - '3306:3306'
-    networks:
-      - app_network
+      POSTGRES_PASSWORD: ${POSTGRESS_ROOT_PASSWORD}
     volumes:
-      - db-data:/var/lib/mysql
-
-  admin:
-    image: phpmyadmin
-    restart: always
-    environment:
-      - PMA_ARBITRARY=1
+      - pgdata:/var/lib/postgresql/data 
+    network_mode: "bridge"
     ports:
-      - 8080:80
-    networks:
-      - app_network
-
-networks:
-  app_network:
-    driver: bridge
-
+      - 6543:5432
+ 
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+ 
 volumes:
-  db-data:
-
+  pgdata:
