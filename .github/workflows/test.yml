@@ -37,7 +37,7 @@ jobs:
 
       run: |
         for i in {1..60}; do
-        docker compose exec db pg_isready -U fablab && break || sleep 5;
+        docker compose exec db pg_isready -U fablab && break || (docker compose log db; sleep 5);
         done
 
 
