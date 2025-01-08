@@ -19,6 +19,7 @@ services:
   web:
     build: .  # This tells Docker Compose to build the image using the Dockerfile in the current directory
     command: /app/wait-for-it.sh db:5432 -- python manage.py runserver 0.0.0.0:8000
+    restart: always
     volumes:
       - ./superfablab:/app
     depends_on:
