@@ -38,3 +38,7 @@ class Visit(models.Model):
     still_in_the_space = models.BooleanField(default=True)
     
     objects = VisitManager()
+    
+    @property
+    def description(self):
+        return f"IN" if self.still_in_the_space else "OUT"

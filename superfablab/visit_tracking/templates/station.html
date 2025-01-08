@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}CheckMeIn Station{% endblock %}
+
+{% block content %}
+
+<table>
+    <tr>
+        <td width="20%">
+            <!-- Logo -->
+            <div id="member_id">
+                <form action="{% url 'station:scan' %}">
+                    <input id="member_id" type="text" name="barcode" size="8" autofocus placeholder="Member ID" /><br />
+                </form>
+            </div>
+        </td>
+        <td width="60%">
+            <center>
+                <h1>Welcome to the Super Fab Lab</h1>
+                <h2><div id="clockbox"></div></h2>
+            </center>
+        </td>
+        <td style="width:30%" valign="top">
+            <table class="side">
+                <tr><th># people in building</th><td>{{ number_present }}</td></tr>
+                <tr><th>Total people today</th><td>{{ unique_visitors_today }}</td></tr>
+                <tr><th>Keyholder</th><td>{{ keyholder_name }}</td></tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<h2>Recent Activity (today)</h2>
+<table style="width:80%">
+    <tr><th>Time In</th><th>Time Out</th><th>Name</th><th>Description</th></tr>
+    {% for trans in todays_transactions %}
+        <tr class="{{ trans.description }}">
+            <td>{{ trans.enter_time|date:"h:i A" }}</td>
+            <td>{{ trans.exit_time|date:"h:i A" }}</td>
+
+            <td>{{ trans.user.first_name }}</td>
+            <td>{{ trans.description }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<script type="text/javascript">
+    const tday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const tmonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    function GetClock() {
+        const d = new Date();
+        const nday = d.getDay(), nmonth = d.getMonth(), ndate = d.getDate(), nyear = d.getFullYear();
+        let nhour = d.getHours(), nmin = d.getMinutes(), nsec = d.getSeconds(), ap;
+
+        if (nhour == 0) { ap = " AM"; nhour = 12; }
+        else if (nhour < 12) { ap = " AM"; }
+        else if (nhour == 12) { ap = " PM"; }
+        else { ap = " PM"; nhour -= 12; }
+
+        if (nmin <= 9) nmin = "0" + nmin;
+        if (nsec <= 9) nsec = "0" + nsec;
+
+        document.getElementById('clockbox').innerHTML = `${tday[nday]}, ${tmonth[nmonth]} ${ndate}, ${nyear}<br/>${nhour}:${nmin}:${nsec}${ap}`;
+    }
+
+    window.onload = function() {
+        GetClock();
+        setInterval(GetClock, 1000);
+    };
+</script>
+{% endblock %}

@@ -84,6 +84,8 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
         response = requests.post(url, headers=headers, json=data)
         if response.status_code == 200:
             val_dic = response.json()
+            if not val_dic.get("user", None):
+                return self
             self.first_name = val_dic["user"]["firstName"]
             self.last_name = val_dic["user"]["lastName"]
             self.email = val_dic["user"]["campusEmail"]
