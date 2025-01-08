@@ -2,20 +2,33 @@ services:
   db:
     image: postgres
     restart: always
-    container_name: postgres
+    container_name: db
     environment:
       POSTGRES_PASSWORD: ${POSTGRESS_ROOT_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data 
-    network_mode: "bridge"
     ports:
-      - 6543:5432
+      - 5432:5432
  
   adminer:
     image: adminer
     restart: always
     ports:
       - 8080:8080
+  
+  web:
+    build: .  # This tells Docker Compose to build the image using the Dockerfile in the current directory
+    command: /app/wait-for-it.sh db:5432 -- python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./superfablab:/app
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://postgres:${POSTGRESS_ROOT_PASSWORD}@db:5432/fablab
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+    ports:
+      - "8000:8000"
+
  
 volumes:
   pgdata:
