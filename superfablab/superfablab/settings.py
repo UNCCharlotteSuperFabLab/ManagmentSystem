@@ -11,14 +11,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from dotenv import dotenv_values
 
 from urllib.parse import urlparse
 
 import os
 
 
-config = dotenv_values("../.env")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -109,8 +107,6 @@ else:
             'PORT': '5432',
         }
     }
-
-print(DATABASES)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

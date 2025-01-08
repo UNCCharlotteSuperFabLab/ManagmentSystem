@@ -10,6 +10,8 @@ from typing import Dict, Tuple
 from canvasapi import Canvas
 from canvasapi.user import User as CanvasUser
 
+import os
+
 
 class SpaceUserManager(BaseUserManager):
     def create_user(self, niner_id, password=None, **extra_fields) -> SpaceUser:
@@ -70,16 +72,16 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
     def __repr__(self):
         return f"space_user({self.niner_id}, {self.first_name}, {self.last_name}, {self.email}, {self.canvas_id})" + super().__repr__()
     
-    def niner_engage_get_updated_values(self, config:Dict[str, str]) -> SpaceUser:
+    def niner_engage_get_updated_values(self) -> SpaceUser:
         if self.first_name and self.last_name and self.email:
-            if "t" in config.get("VERBOSE_DEBUG", "false").lower(): print(f"Values Already set, shouldnt have run")
+            print(f"Values Already set, shouldnt have run")
             return self
         url = "https://ninerengage.charlotte.edu/api/discovery/swipe/attendance"
-        headers = {"Cookie": config["NINER_ENGAGE_COOKIE"],
-               "X-Xsrf-Token": config["NINER_ENGAGE_TOKEN"]}
+        headers = {"Cookie": os.getenv("NINER_ENGAGE_COOKIE"),
+               "X-Xsrf-Token": os.getenv("NINER_ENGAGE_TOKEN")}
         data = {
             "swipe": self.niner_id,
-            "token": config["NINER_ENGAGE_PAYLOAD_TOKEN"]
+            "token": os.getenv("NINER_ENGAGE_PAYLOAD_TOKEN")
         }
         response = requests.post(url, headers=headers, json=data)
         if response.status_code == 200:
@@ -91,13 +93,13 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
             self.email = val_dic["user"]["campusEmail"]
             self.save()
         else:
-            if "t" in config.get("VERBOSE_DEBUG", "false").lower(): print(f"response: {response.status_code} -- {response.text}")
+            print(f"response: {response.status_code} -- {response.text}")
         return self
     
-    def get_canvas_id_from_canvas(self, config:Dict[str, str]) -> SpaceUser:
+    def get_canvas_id_from_canvas(self) -> SpaceUser:
         if self.canvas_id:
             return self
-        canvas = Canvas("https://instructure.charlotte.edu", config["CANVAS_API_KEY"])
+        canvas = Canvas("https://instructure.charlotte.edu", os.getenv("CANVAS_API_KEY"))
         course = canvas.get_course(231237)
         for couse_user in course.get_users():
             couse_user: CanvasUser
@@ -112,5 +114,3 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
         else:
             self.save()
             return self
-
-
