@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}CheckMeIn Station{% endblock %}
+{% block title %}Station{% endblock %}
 
 {% block content %}
+<div id="loading" style="display: none;">Attempting to fetch user data...</div>
 
 <table>
     <tr>
@@ -43,6 +44,16 @@
         </tr>
     {% endfor %}
 </table>
+
+<script>
+    const form = document.querySelector('form');
+    const loadingIndicator = document.getElementById('loading');
+  
+    form.addEventListener('submit', function() {
+      loadingIndicator.style.display = 'block';
+    });
+  </script>
+  
 
 <script type="text/javascript">
     const tday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
