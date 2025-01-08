@@ -26,6 +26,7 @@ jobs:
         NINER_ENGAGE_TOKEN: ${{ secrets.NINER_ENGAGE_TOKEN }}
         NINER_ENGAGE_PAYLOAD_TOKEN: ${{ secrets.NINER_ENGAGE_PAYLOAD_TOKEN }}
         CANVAS_API_KEY: ${{ secrets.CANVAS_API_KEY }}
+        POSTGRESS_ROOT_PASSWORD: ${{ secrets.POSTGRESS_ROOT_PASSWORD }}
 
       run: |
         docker compose exec -T web python manage.py test
