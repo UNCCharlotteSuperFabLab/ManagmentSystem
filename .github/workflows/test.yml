@@ -1,0 +1,33 @@
+name: Django Tests with Docker Compose
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Compose
+      run: |
+        docker-compose -f docker-compose.yml up -d
+
+    - name: Wait for database to be ready
+      run: |
+        docker-compose exec -T postgres pg_isready -U user
+
+    - name: Run Django tests
+      run: |
+        docker-compose exec -T web python manage.py test
+
+    - name: Tear down Docker Compose
+      run: |
+        docker-compose down
