@@ -36,7 +36,9 @@ jobs:
         POSTGRESS_ROOT_PASSWORD: ${{ secrets.POSTGRESS_ROOT_PASSWORD }}
 
       run: |
-        docker compose exec -T db pg_isready -U fablab
+        for i in {1..60}; do
+        docker compose exec db pg_isready -U fablab && break || sleep 5;
+        done
 
 
     - name: Run Django tests
