@@ -26,6 +26,11 @@ jobs:
 
       run: |
         docker compose -f docker-compose.yaml up -d
+    
+    - name: Wait for database to be ready
+      run: |
+        docker compose exec -T postgres pg_isready -U fablab
+
 
     - name: Run Django tests
       env:
