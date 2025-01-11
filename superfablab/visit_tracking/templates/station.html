@@ -10,9 +10,10 @@
         <td width="20%">
             <!-- Logo -->
             <div id="member_id">
-                <form action="{% url 'station:scan' %}">
+                <form action="{% url 'station:scan' %}" method='post'>
+                    {% csrf_token %}
                     <input id="member_id" type="text" name="barcode" size="8" autofocus placeholder="Member ID" /><br />
-                </form>
+                </form> 
             </div>
         </td>
         <td width="60%">

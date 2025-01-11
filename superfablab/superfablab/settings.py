@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-@*e1k)yqm#p5*py^+u2&9cdyq5%f%ez=0y(t1m@v30*p_8_spq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'db']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'db', "*"]
 
 
 # Application definition
@@ -39,6 +39,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'db']
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'visit_tracking.apps.VisitTrackingConfig',
+    'tools_and_trainings.apps.ToolsAndTrainingsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,7 +63,7 @@ ROOT_URLCONF = 'superfablab.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'superfablab', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -145,8 +146,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / "superfablab" / "static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "home"

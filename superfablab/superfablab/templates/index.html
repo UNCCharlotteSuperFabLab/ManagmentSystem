@@ -1,0 +1,25 @@
+
+{% extends "base.html" %}
+
+{% block title %}SFL - Homepage{% endblock %}
+
+{% block content %}
+
+<h1> Welcome to the SUPER FAB LAB Homepage </h1>
+
+<a href="/station/scan"> GO TO STATION</a>
+
+{% if user.is_authenticated %}
+Hi {{ user.first_name }}!
+
+<form action="{% url 'logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Log Out</button>
+  </form>
+  
+{% else %}
+<p>You are not logged in</p>
+<a href="{% url 'login' %}">Log In</a>
+{% endif %}
+
+{% endblock content %}

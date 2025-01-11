@@ -10,8 +10,8 @@ from datetime import timedelta
 
 
 def scan(request):
-    if request.method == 'GET' and 'barcode' in request.GET:
-        barcode = request.GET['barcode']
+    if request.method == 'POST' and 'barcode' in request.POST:
+        barcode = request.POST['barcode']
         user = Visit.objects.scan(barcode)
         if not user.first_name or not user.last_name or not user.email:
             return redirect('station:new_user_form', niner_id=barcode)
