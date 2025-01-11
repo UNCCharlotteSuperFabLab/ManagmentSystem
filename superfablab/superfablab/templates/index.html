@@ -5,21 +5,26 @@
 
 {% block content %}
 
-<h1> Welcome to the SUPER FAB LAB Homepage </h1>
+<div class='container'>
+    <div class='columns is-centered'>
+        <div class='column is-third has-text-centered'>
+            <h1 class="title is-1"> Welcome to the <span class="has-text-primary">SUPER FAB LAB</span> Homepage </h1>
+        </div>
+    </div>
+</div>
 
-<a href="/station/scan"> GO TO STATION</a>
+<div class='section'>
+    <div class="grid">
+        <div class="cell">
+            <a class="button is-fullwidth" href="/station/scan">GO TO STATION</a>
+        </div>
+        {% if user.is_staff %}
+            <div class="cell">
+                <a class="button is-fullwidth" href="/station/scan">View current users</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
 
-{% if user.is_authenticated %}
-Hi {{ user.first_name }}!
-
-<form action="{% url 'logout' %}" method="post">
-    {% csrf_token %}
-    <button type="submit">Log Out</button>
-  </form>
-  
-{% else %}
-<p>You are not logged in</p>
-<a href="{% url 'login' %}">Log In</a>
-{% endif %}
 
 {% endblock content %}

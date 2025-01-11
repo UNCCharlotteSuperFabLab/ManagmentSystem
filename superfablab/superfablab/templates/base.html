@@ -10,7 +10,8 @@
 
     <title>{% block title %}Super Fab Lab{% endblock %}</title>
 </head>
-<body class="has-navbar-fixed-top">
+<body class="{% block body_class %}has-navbar-fixed-top{% endblock %}">
+    {% block header %}
     <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
           <a class="navbar-item" href="/">Home</a>
@@ -57,6 +58,7 @@
           </div>
         </div>
       </nav>
+      {% endblock header %}
       
     <div>
         {% block content %}

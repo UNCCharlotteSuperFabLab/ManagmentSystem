@@ -1,12 +1,40 @@
 {% extends "base.html" %}
 
-{% block title %}Login{% endblock %}
+{% block title %}SFL - Login{% endblock %}
 
 {% block content %}
-<h2>Log In</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form }}
-  <button type="submit">Log In</button>
-</form>
+<section class="section">
+  <div class="container">
+    <div class="columns is-vcentered is-centered">
+      <div class="column is-half">
+        <div class="box">
+          <h2 class="title is-4 has-text-centered">Log In</h2>
+          <form method="post">
+            {% csrf_token %}
+
+            <div class="field">
+              <label for="id_username" class="label">800#</label>
+              <div class="control">
+                <input type="text" name="username" class="input"  required id="id_username">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="password" class="label">Password</label>
+              <div class="control">
+                <input type="password" name="password" class="input" required id="id_password">
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="control">
+                <button type="submit" class="button is-primary is-fullwidth">Log In</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}

@@ -1,14 +1,55 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>New User Form</title>
-</head>
-<body>
-    <h1>Welcome! Please Fill Out Your Information</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Submit</button>
-    </form>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}SFL - First Time User{% endblock %}
+
+{% block body_class %}{% endblock %}
+
+{% block header%} {% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="columns is-vcentered is-centered">
+      <div class="column is-half">
+        <div class="box">
+          <h2 class="title is-4 has-text-centered">First Time Guest</h2>
+          <form method="post">
+            {% csrf_token %}
+
+            <div class="field">
+              <label for="id_first_name" class="label">First Name</label>
+              <div class="control">
+                <input type="text" name="first_name" class="input"  required id="id_first_name">
+              </div>
+            </div>  
+
+
+            <div class="field">
+              <label for="id_last_name" class="label">Last Name</label>
+              <div class="control">
+                <input type="text" name="last_name" class="input" required id="id_last_name">
+              </div>
+            </div>
+
+
+            <div class="field">
+                <label for="id_email" class="label">@charlotte.edu email</label>
+                <div class="control">
+                  <input type="email" name="email" class="input" required id="id_email">
+                </div>
+              </div>
+
+            
+
+            <div class="field">
+              <div class="control">
+                <button type="submit" class="button is-primary is-fullwidth">Enter SFL</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

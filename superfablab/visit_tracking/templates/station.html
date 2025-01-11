@@ -1,84 +1,124 @@
 {% extends "base.html" %}
 
-{% block title %}Station{% endblock %}
+{% block title %}SFL - Station{% endblock %}
+
+{% block body_class %}{% endblock %}
+
+{% block header%} {% endblock %}
 
 {% block content %}
-<div id="loading" style="display: none;">Attempting to fetch user data...</div>
-
-<table>
-    <tr>
-        <td width="20%">
-            <!-- Logo -->
-            <div id="member_id">
-                <form action="{% url 'station:scan' %}" method='post'>
-                    {% csrf_token %}
-                    <input id="member_id" type="text" name="barcode" size="8" autofocus placeholder="Member ID" /><br />
-                </form> 
+<section class="section">
+  <div class="container">
+    <div class="columns is-vcentered">
+      <!-- Member ID Form -->
+      <div class="column is-one-fifth">
+        <div id="member_id" class="box">
+          <form action="{% url 'station:scan' %}" method="post">
+            {% csrf_token %}
+            <div class="field">
+              <div id="member-id-control" class="control">
+                <input 
+                  id="member_id" 
+                  class="input" 
+                  type="text" 
+                  name="barcode" 
+                  autofocus 
+                  placeholder="Member ID" />
+              </div>
             </div>
-        </td>
-        <td width="60%">
-            <center>
-                <h1>Welcome to the Super Fab Lab</h1>
-                <h2><div id="clockbox"></div></h2>
-            </center>
-        </td>
-        <td style="width:30%" valign="top">
-            <table class="side">
-                <tr><th># people in building</th><td>{{ number_present }}</td></tr>
-                <tr><th>Total people today</th><td>{{ unique_visitors_today }}</td></tr>
-                <tr><th>Keyholder</th><td>{{ keyholder_name }}</td></tr>
-            </table>
-        </td>
-    </tr>
-</table>
+          </form>
+        </div>
+      </div>
 
-<h2>Recent Activity (today)</h2>
-<table style="width:80%">
-    <tr><th>Time In</th><th>Time Out</th><th>Name</th><th>Description</th></tr>
-    {% for trans in todays_transactions %}
-        <tr class="{{ trans.description }}">
+      <!-- Welcome Message -->
+      <div class="column is-three-fifths has-text-centered">
+        <h1 class="title">Welcome to the <a class="has-text-primary" href="{% url 'home' %}">Super Fab Lab</a></h1>
+        <h2 class="subtitle" id="clockbox"></h2>
+      </div>
+
+      <!-- Sidebar Stats -->
+      <div class="column is-one-fifths">
+        <div class="box">
+          <table class="table is-fullwidth">
+            <tr>
+              <th># People in Building</th>
+              <td>{{ number_present }}</td>
+            </tr>
+            <tr>
+              <th>Total People Today</th>
+              <td>{{ unique_visitors_today }}</td>
+            </tr>
+            <tr>
+              <th>Keyholder</th>
+              <td>{{ keyholder_name }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="title">Recent Activity (Today)</h2>
+    <div class="table-container">
+      <table class="table is-fullwidth">
+        <thead>
+          <tr>
+            <th>Time In</th>
+            <th>Time Out</th>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for trans in todays_transactions %}
+          <tr class="{% if trans.description == 'IN' %}has-background-05{% elif trans.description == 'OUT' %}has-background-background{% endif %}">
             <td>{{ trans.enter_time|date:"h:i A" }}</td>
             <td>{{ trans.exit_time|date:"h:i A" }}</td>
-
             <td>{{ trans.user.first_name }}</td>
             <td>{{ trans.description }}</td>
-        </tr>
-    {% endfor %}
-</table>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
 
 <script>
-    const form = document.querySelector('form');
-    const loadingIndicator = document.getElementById('loading');
+  const form = document.querySelector('form');
+  const memberIdInput = document.getElementById('member-id-control');
   
-    form.addEventListener('submit', function() {
-      loadingIndicator.style.display = 'block';
-    });
-  </script>
-  
+  form.addEventListener('submit', function() {
+    memberIdInput.classList.add('is-loading');
+  });
+</script>
 
 <script type="text/javascript">
-    const tday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const tmonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const tday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const tmonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-    function GetClock() {
-        const d = new Date();
-        const nday = d.getDay(), nmonth = d.getMonth(), ndate = d.getDate(), nyear = d.getFullYear();
-        let nhour = d.getHours(), nmin = d.getMinutes(), nsec = d.getSeconds(), ap;
+  function GetClock() {
+    const d = new Date();
+    const nday = d.getDay(), nmonth = d.getMonth(), ndate = d.getDate(), nyear = d.getFullYear();
+    let nhour = d.getHours(), nmin = d.getMinutes(), nsec = d.getSeconds(), ap;
 
-        if (nhour == 0) { ap = " AM"; nhour = 12; }
-        else if (nhour < 12) { ap = " AM"; }
-        else if (nhour == 12) { ap = " PM"; }
-        else { ap = " PM"; nhour -= 12; }
+    if (nhour == 0) { ap = " AM"; nhour = 12; }
+    else if (nhour < 12) { ap = " AM"; }
+    else if (nhour == 12) { ap = " PM"; }
+    else { ap = " PM"; nhour -= 12; }
 
-        if (nmin <= 9) nmin = "0" + nmin;
-        if (nsec <= 9) nsec = "0" + nsec;
+    if (nmin <= 9) nmin = "0" + nmin;
+    if (nsec <= 9) nsec = "0" + nsec;
 
-        document.getElementById('clockbox').innerHTML = `${tday[nday]}, ${tmonth[nmonth]} ${ndate}, ${nyear}<br/>${nhour}:${nmin}:${nsec}${ap}`;
-    }
+    document.getElementById('clockbox').innerHTML = `${tday[nday]}, ${tmonth[nmonth]} ${ndate}, ${nyear}<br>${nhour}:${nmin}:${nsec}${ap}`;
+  }
 
-    window.onload = function() {
-        GetClock();
-        setInterval(GetClock, 1000);
-    };
+  window.onload = function() {
+    GetClock();
+    setInterval(GetClock, 1000);
+  };
 </script>
 {% endblock %}
