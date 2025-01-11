@@ -5,6 +5,8 @@ class TrainingCategory(models.Model):
     name = models.TextField()
     canvas_id = models.IntegerField(null=True, blank=True)
     user_url = models.TextField(null=True, blank=True)
+    def __str__(self):
+        return self.name
 
 # Create your models here.
 class Training(models.Model):

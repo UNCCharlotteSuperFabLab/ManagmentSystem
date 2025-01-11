@@ -10,6 +10,6 @@ class TrainingCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Training)
 class TrainingAdmin(admin.ModelAdmin):
-    list_display = ('user', 'category', 'training_level', 'completed_on')
+    list_display = ('user', 'category__name', 'training_level', 'completed_on')
     list_filter = ('training_level', 'completed_on')  
-    search_fields = ('user__username', 'category__name')  
+    search_fields = ('user__first_name', 'user__last_name', 'category__name')  
