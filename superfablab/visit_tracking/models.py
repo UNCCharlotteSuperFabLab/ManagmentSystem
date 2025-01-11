@@ -3,9 +3,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 
-
-
-
 class VisitManager(models.Manager):
     def get_signed_in_users(self):
         return get_user_model().objects.filter(
