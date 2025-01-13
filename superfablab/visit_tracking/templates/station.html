@@ -7,85 +7,111 @@
 {% block header%} {% endblock %}
 
 {% block content %}
-<section class="section">
-  <div class="container">
+
+<section class="section is-fullwidth">
+
+  {% comment %} <div class="container is-fullwidth"> {% endcomment %}
     <div class="columns is-vcentered">
-      <!-- Member ID Form -->
-      <div class="column is-one-fifth">
-        <div id="member_id" class="box">
-          <form action="{% url 'station:scan' %}" method="post">
-            {% csrf_token %}
-            <div class="field">
-              <div id="member-id-control" class="control">
-                <input 
-                  id="member_id" 
-                  class="input" 
-                  type="text" 
-                  name="barcode" 
-                  autofocus 
-                  placeholder="Member ID" />
-              </div>
+      <div class="column is-four-fifths"> 
+        <div class="columns is-vcentered">
+          <!-- Member ID Form -->
+          <div class="column is-one-fifth">
+            <div id="member_id" class="box">
+              <form action="{% url 'station:scan' %}" method="post">
+                {% csrf_token %}
+                <div class="field">
+                  <div id="member-id-control" class="control">
+                    <input id="redirectID" type="hidden", name="redirect", value="{% url 'station:scan' %}">
+                    <input 
+                      id="member_id" 
+                      class="input" 
+                      type="text" 
+                      name="barcode" 
+                      autofocus 
+                      placeholder="Member ID" />
+                  </div>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
+          
+
+          <!-- Welcome Message -->
+          <div class="column has-text-centered">
+            <h1 class="title has-text-weight-bold is-size-1">Welcome to the <a class="has-text-primary" href="{% url 'home' %}">Super Fab Lab</a></h1>
+            <h2 class="subtitle is-size-3" id="clockbox"></h2>
+          </div>
+          
+    
         </div>
-      </div>
 
-      <!-- Welcome Message -->
-      <div class="column is-three-fifths has-text-centered">
-        <h1 class="title">Welcome to the <a class="has-text-primary" href="{% url 'home' %}">Super Fab Lab</a></h1>
-        <h2 class="subtitle" id="clockbox"></h2>
-      </div>
+        <div class="container">
+          <h2 class="title">Recent Activity (Today)</h2>
+          <div class="table-container has-text-weight-bold is-size-5">
+            <table class="table is-fullwidth">
+              <thead>
+                <tr>
+                  <th>Time In</th>
+                  <th>Time Out</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for trans in todays_transactions %}
+                <tr class="{% if trans.description == 'IN' %}has-background-05{% elif trans.description == 'OUT' %}has-background-background{% endif %}">
+                  <td>{{ trans.enter_time|date:"h:i A" }}</td>
+                  <td>{{ trans.exit_time|date:"h:i A" }}</td>
+                  <td>{{ trans.user.first_name }}</td>
+                  <td>{{ trans.description }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-      <!-- Sidebar Stats -->
-      <div class="column is-one-fifths">
-        <div class="box">
+      </div>
+      <div class="column is-one-fifth">
+        <div class="box has-text-weight-bold is-size-5">
+          <h2 class="title">Info at a glance 👀</h2>
+          <h3 class="title has-text-weight-bold is-size-3"> Current Keyholder: {{ keyholder_name }} </h3>
+          <img src="https://static1.srcdn.com/wordpress/wp-content/uploads/2020/04/barney-stinson-Cropped.v1-1.jpg"/>
+
           <table class="table is-fullwidth">
             <tr>
-              <th># People in Building</th>
+              <th># in Building</th>
               <td>{{ number_present }}</td>
             </tr>
             <tr>
-              <th>Total People Today</th>
+              <th>Unique Today</th>
               <td>{{ unique_visitors_today }}</td>
             </tr>
             <tr>
-              <th>Keyholder</th>
-              <td>{{ keyholder_name }}</td>
+              <th>Open Printers</th>
+              <td>XX</td>
             </tr>
+            <tr>
+              <th>Hours (Week)</th>
+              <td>XX,XXX</td>
+            </tr>
+
+            <tr>
+              <th>Other Fun</th>
+              <td>Stats Here</td>
+            </tr>
+
+
+            
           </table>
         </div>
       </div>
     </div>
-  </div>
+
+  {% comment %} </div> {% endcomment %}
+
 </section>
 
-<section class="section">
-  <div class="container">
-    <h2 class="title">Recent Activity (Today)</h2>
-    <div class="table-container">
-      <table class="table is-fullwidth">
-        <thead>
-          <tr>
-            <th>Time In</th>
-            <th>Time Out</th>
-            <th>Name</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for trans in todays_transactions %}
-          <tr class="{% if trans.description == 'IN' %}has-background-05{% elif trans.description == 'OUT' %}has-background-background{% endif %}">
-            <td>{{ trans.enter_time|date:"h:i A" }}</td>
-            <td>{{ trans.exit_time|date:"h:i A" }}</td>
-            <td>{{ trans.user.first_name }}</td>
-            <td>{{ trans.description }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
 
 <script>
   const form = document.querySelector('form');

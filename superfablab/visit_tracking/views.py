@@ -12,10 +12,14 @@ from datetime import timedelta
 def scan(request):
     if request.method == 'POST' and 'barcode' in request.POST:
         barcode = request.POST['barcode']
+        redirect_val = request.POST['redirect']
         user = Visit.objects.scan(barcode)
         if not user.first_name or not user.last_name or not user.email:
             return redirect('station:new_user_form', niner_id=barcode)
         # Process the scanned card here (e.g., log attendance)
+        if redirect_val:
+            return redirect(redirect_val)
+        
         return redirect('station:scan')
     
     today_start = localtime(now()).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -29,7 +33,7 @@ def scan(request):
     # Example data
     number_present = Visit.objects.filter(still_in_the_space=True).count()
     unique_visitors_today = Visit.objects.filter(enter_time__range=(today_start, today_end)).distinct('user').count()
-    keyholder_name = "John Doe"  # Replace with actual logic
+    keyholder_name = "Barney Stinson"  # Replace with actual logic
     # todays_transactions = Visit.objects.filter(enter_time__range=(today_start, today_end))
 
     context = {

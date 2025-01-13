@@ -1,12 +1,22 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en" class="theme-dark">
+<html lang="en" class="dark" data-theme="dark" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="{% static 'css/custom-bulma.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/dataTables.bulma.css">
+
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.bulma.js"></script>
+
+
 
     <title>{% block title %}Super Fab Lab{% endblock %}</title>
 </head>
@@ -60,11 +70,9 @@
       </nav>
       {% endblock header %}
       
-    <div>
-        {% block content %}
+      {% block content %}
 
-        {% endblock content %}
-    </div>
+      {% endblock content %}
 </body>
 </html>
 

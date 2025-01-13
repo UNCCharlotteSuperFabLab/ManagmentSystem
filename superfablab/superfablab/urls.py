@@ -26,6 +26,7 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),
     path("station/", include("visit_tracking.urls")),
     path('', views.index, name='home'),
-    path('me/profile', views.profile, name='profile')
+    path('me/profile', views.profile, name='profile'),
+    path('staff/user_list', views.users_in_space, name = 'user_list')
     
 ]
