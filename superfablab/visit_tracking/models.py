@@ -13,7 +13,7 @@ class VisitManager(models.Manager):
         user, created = get_user_model().objects.get_or_create(niner_id=niner_id)
         with transaction.atomic():
             active_vist = self.filter(user=user, still_in_the_space=True).first()
-            
+            print(active_vist)
             if active_vist:
                 active_vist:Visit
                 #sign out
@@ -31,8 +31,9 @@ class VisitManager(models.Manager):
 class Visit(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="visit")
     enter_time = models.DateTimeField(auto_now_add=True)
-    exit_time = models.DateTimeField(null=True)
+    exit_time = models.DateTimeField(null=True, blank=True)
     still_in_the_space = models.BooleanField(default=True)
+    forgot_to_signout = models.BooleanField(null=True, blank=True)
     
     objects = VisitManager()
     
