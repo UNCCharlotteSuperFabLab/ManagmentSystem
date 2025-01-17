@@ -135,22 +135,15 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
             return self
         
 class Keyholder(models.Model):
-    user = models.ForeignKey(SpaceUser, on_delete=models.CASCADE, related_name="keyholder")
+    user = models.OneToOneField(SpaceUser, on_delete=models.CASCADE, related_name="keyholder")
     is_keyholder = models.BooleanField()
     priority = models.IntegerField(default=0)
 
 class KeyolderHistoryManager(models.Manager):
     def get_current_keyholder(self) -> KeyholderHistory:
         return KeyholderHistory.objects.filter(exit_time__isnull=True).order_by('-start_time').first()
-    def is_keyholder(self, user:SpaceUser) -> int:
-        int = 0
-        if user.keyholder.filter(is_keyholder=True).exists():
-            int = 1 
-        
-        if user.keyholder.filter(is_prefered_keyholder=True).exists():
-            int = 2
-        
-        return int
+    def is_keyholder(self, user:SpaceUser) -> bool:
+        return user.keyholder.filter(is_keyholder=True).exists()
     def create_keyholder_history(self, user:SpaceUser) -> KeyholderHistory:
         if self.is_keyholder(user):
             keyholder_history = self.create(keyholder=user, start_time=now())
