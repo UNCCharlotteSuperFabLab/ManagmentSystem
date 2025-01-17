@@ -19,6 +19,9 @@ from django.urls import include, path
 from django.shortcuts import redirect
 from . import views
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path("users/", include("users.urls")),
@@ -30,3 +33,6 @@ urlpatterns = [
     path('staff/user_list', views.users_in_space, name = 'user_list')
     
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
