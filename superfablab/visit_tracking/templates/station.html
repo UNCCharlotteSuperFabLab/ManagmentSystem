@@ -17,11 +17,11 @@
       <button class="delete" aria-label="close"></button>
     </header>
     <section class="modal-card-body">
-      {% if keyholder and not keyholder.is_priority_keyholder %}
-        
-        <p class="title is-size-3"></p>
+      {% if keyholder and user.keyholder.priority > keyholder.priority %}
+        <p class="title is-size-3">Scan to confirm taking over keyholder from {{keyholder_name}}</p>
+        <p>Make sure to let them know</p>
       {% else %}
-
+        <p class="title is-size-3">Scan to confirm becoming keyholder</p>
       {% endif%}
 
       <form action="{% url 'station:scan' %}" method="post">
@@ -30,6 +30,8 @@
           <div id="member-id-control" class="control">
             {% comment %} <input id="redirectID" type="hidden", name="redirect", value="{% url 'station:scan' %}"> {% endcomment %}
             <input id="keyholder_form_ID" type="hidden", name="assign_keyholder", value="true">
+            <input id="sign_out_form_ID" type="hidden", name="sign_out_current_keyholder", value="false">
+
             <input 
               id="member_id" 
               class="input" 
@@ -44,7 +46,16 @@
     <footer class="modal-card-foot">
       {% if keyholder %}
         <div class="buttons">
-          <button class="button">Don't Take Over</button>
+          <form method="POST", action="{% url 'station:scan' %}">
+            {% csrf_token %}
+            <input id="keyholder_form_ID" type="hidden", name="assign_keyholder", value="false">
+            <input 
+            id="member_id" 
+            type="hidden" 
+            name="barcode"
+            value="{{user.niner_id}}"/>
+            <input type="submit" class="button" value="Don't Take Over">
+          </form>  
         </div>
       {% else %}
 
@@ -85,6 +96,7 @@
             <div id="member-id-control" class="control">
               {% comment %} <input id="redirectID" type="hidden", name="redirect", value="{% url 'station:scan' %}"> {% endcomment %}
               <input id="keyholder_form_ID" type="hidden", name="assign_keyholder", value="true">
+              <input id="sign_out_form_ID" type="hidden", name="sign_out_current_keyholder", value="true">
               <input 
                 id="member_id" 
                 class="input" 
@@ -116,7 +128,6 @@
   </div>
 </div>
 
-CURRENT KEYHOLDER
 {% endif%}
 
 
@@ -212,7 +223,7 @@ CURRENT KEYHOLDER
             </tr>
             <tr>
               <th>Hours (Week)</th>
-              <td>XX,XXX</td>
+              <td>{{weekly_hours|floatformat:1|default_if_none:"0.0"|add:""|floatformat:1}}</td>
             </tr>
 
             <tr>
