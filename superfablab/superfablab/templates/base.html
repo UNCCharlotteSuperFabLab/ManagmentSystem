@@ -1,0 +1,117 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" class="dark" data-theme="dark" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{% static 'css/custom-bulma.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/dataTables.bulma.css">
+
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.bulma.js"></script>
+
+    <style>
+      :root {
+        --bulma-primary-h: 47deg;
+        --bulma-primary-s: 26%;
+        --bulma-primary-l: 52%;
+        --bulma-link-h: 182deg;
+        --bulma-link-l: 23%;
+        --bulma-success-h: 160deg;
+        --bulma-success-s: 100%;
+        --bulma-success-l: 16%;
+        --bulma-scheme-h: 50;
+        --bulma-scheme-s: 69%;
+        --bulma-light-l: 82%;
+      }
+    </style>
+
+
+
+    <title>{% block title %}Super Fab Lab{% endblock %}</title>
+</head>
+<body class="{% block body_class %}has-navbar-fixed-top{% endblock %}">
+    {% block header %}
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+          <a class="navbar-item" href={% url 'home' %}><img src="/media/sfltag.png" /></a>
+      
+          <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </a>
+        </div>
+      
+        <div id="navbarBasicExample" class="navbar-menu">
+          <div class="navbar-start">
+            
+          </div>
+      
+          <div class="navbar-end">
+            <div class="navbar-item">
+            {% if user.is_authenticated %}
+                <div class="buttons">
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="button is-light">Log Out</button>
+                    </form>
+                    <a class="button is-light" href="{% url 'profile' %}">{{ user.first_name }}</a>
+                </div>
+
+                
+                  
+                {% else %}
+                    <div class="buttons">
+                        <a class="button is-primary">
+                            <strong>Sign up</strong>
+                        </a>
+                        <a class="button is-light", href="{% url 'login' %}">
+                            Log in
+                        </a>
+                    </div>
+                {% endif %}
+                
+              
+            </div>
+          </div>
+        </div>
+      </nav>
+      {% endblock header %}
+      
+      {% block content %}
+
+      {% endblock content %}
+</body>
+</html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Get all "navbar-burger" elements
+        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+      
+        // Add a click event on each of them
+        $navbarBurgers.forEach( el => {
+          el.addEventListener('click', () => {
+      
+            // Get the target from the "data-target" attribute
+            const target = el.dataset.target;
+            const $target = document.getElementById(target);
+      
+            // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+            el.classList.toggle('is-active');
+            $target.classList.toggle('is-active');
+      
+          });
+        });
+      
+      });
+</script>

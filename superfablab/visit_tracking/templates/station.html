@@ -1,83 +1,309 @@
 {% extends "base.html" %}
 
-{% block title %}Station{% endblock %}
+{% block title %}SFL - Station{% endblock %}
+
+{% block body_class %}{% endblock %}
+
+{% block header%} {% endblock %}
 
 {% block content %}
-<div id="loading" style="display: none;">Attempting to fetch user data...</div>
 
-<table>
-    <tr>
-        <td width="20%">
-            <!-- Logo -->
-            <div id="member_id">
-                <form action="{% url 'station:scan' %}">
-                    <input id="member_id" type="text" name="barcode" size="8" autofocus placeholder="Member ID" /><br />
-                </form>
+{% if first_keyholder_modal %}
+<div id="first_keyholder_modal_id" class="modal is-active">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Becoming Keyholder</p>
+      <button class="delete" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      {% if keyholder and user.keyholder.priority > keyholder.priority %}
+        <p class="title is-size-3">Scan to confirm taking over keyholder from {{keyholder_name}}</p>
+        <p>Make sure to let them know</p>
+      {% else %}
+        <p class="title is-size-3">Scan to confirm becoming keyholder</p>
+      {% endif%}
+
+      <form action="{% url 'station:scan' %}" method="post">
+        {% csrf_token %}
+        <div class="field">
+          <div id="member-id-control" class="control">
+            {% comment %} <input id="redirectID" type="hidden", name="redirect", value="{% url 'station:scan' %}"> {% endcomment %}
+            <input id="keyholder_form_ID" type="hidden", name="assign_keyholder", value="true">
+            <input id="sign_out_form_ID" type="hidden", name="sign_out_current_keyholder", value="false">
+
+            <input 
+              id="member_id" 
+              class="input" 
+              type="text" 
+              name="barcode" 
+              autofocus 
+              placeholder="Keyholder ID" />
+          </div>
+        </div>
+      </form>
+    </section>
+    <footer class="modal-card-foot">
+      {% if keyholder %}
+        <div class="buttons">
+          <form method="POST", action="{% url 'station:scan' %}">
+            {% csrf_token %}
+            <input id="keyholder_form_ID" type="hidden", name="assign_keyholder", value="false">
+            <input 
+            id="member_id" 
+            type="hidden" 
+            name="barcode"
+            value="{{user.niner_id}}"/>
+            <input type="submit" class="button" value="Don't Take Over">
+          </form>  
+        </div>
+      {% else %}
+
+      {% endif%}
+
+    </footer>
+  </div>
+</div>
+{% endif%}
+
+{% if current_keyholder_modal %}
+<div id="current_keyholder_modal_id" class="modal is-active">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">You are currently the keyholder</p>
+      <button class="delete" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="notification is-warning">
+        <p class="mb-3">If you sign out now, you will close down the space setting <strong>{{ number_present|add:"-1" }}</strong> people to forgot</p>
+        <p class="mb-3">If you need to hand over the space, get one of the other keyholders to scan to take over the space:</p>
+      
+        {% if keyholders_list %}
+          <div class="content">
+            <ul>
+              {% for keyholder in keyholders_list %}
+                <li><strong>{{ keyholder.user }}</strong></li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% else %}
+          <p> you are currently the only keyholder in the building </p>
+        {% endif %}
+        <form action="{% url 'station:scan' %}" method="post">
+          {% csrf_token %}
+          <div class="field">
+            <div id="member-id-control" class="control">
+              {% comment %} <input id="redirectID" type="hidden", name="redirect", value="{% url 'station:scan' %}"> {% endcomment %}
+              <input id="keyholder_form_ID" type="hidden", name="assign_keyholder", value="true">
+              <input id="sign_out_form_ID" type="hidden", name="sign_out_current_keyholder", value="true">
+              <input 
+                id="member_id" 
+                class="input" 
+                type="text" 
+                name="barcode" 
+                autofocus 
+                placeholder="Keyholder ID" />
             </div>
-        </td>
-        <td width="60%">
-            <center>
-                <h1>Welcome to the Super Fab Lab</h1>
-                <h2><div id="clockbox"></div></h2>
-            </center>
-        </td>
-        <td style="width:30%" valign="top">
-            <table class="side">
-                <tr><th># people in building</th><td>{{ number_present }}</td></tr>
-                <tr><th>Total people today</th><td>{{ unique_visitors_today }}</td></tr>
-                <tr><th>Keyholder</th><td>{{ keyholder_name }}</td></tr>
+          </div>
+        </form>
+      </div>
+      
+
+    </section>
+    <footer class="modal-card-foot">
+      <div class="buttons">
+        <form method="POST", action="{% url 'station:close_space' %}">
+          {% csrf_token %}
+          <input 
+          id="member_id" 
+          type="hidden" 
+          name="barcode"
+          value="{{keyholder.keyholder.niner_id}}"/>
+          <input type="submit" class="button is-danger" value="Close Space">
+        </form>
+        <button class="button">Cancel</button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+{% endif%}
+
+
+<section class="section is-fullwidth">
+
+  {% comment %} <div class="container is-fullwidth"> {% endcomment %}
+    <div class="columns is-vcentered">
+      <div class="column is-four-fifths"> 
+        <div class="columns is-vcentered">
+          <!-- Member ID Form -->
+          <div class="column is-one-fifth">
+            <div id="member_id" class="box">
+              <form action="{% url 'station:scan' %}" method="post">
+                {% csrf_token %}
+                <div class="field">
+                  <div id="member-id-control" class="control">
+                    {% comment %} <input id="redirectID" type="hidden", name="redirect", value="{% url 'station:scan' %}"> {% endcomment %}
+                    <input 
+                      id="member_id" 
+                      class="input" 
+                      type="text" 
+                      name="barcode" 
+                      autofocus 
+                      placeholder="Member ID" />
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          
+
+          <!-- Welcome Message -->
+          {% if keyholder_name %}
+          <div class="column has-text-centered">
+            <h1 class="title has-text-weight-bold is-size-1">Welcome to the <a class="has-text-primary" href="{% url 'home' %}">Super Fab Lab</a></h1>
+            <h2 class="subtitle is-size-3" id="clockbox"></h2>
+          </div>
+          {% else %}
+          <div class="column has-text-centered">
+            <h1 class="title has-text-weight-bold is-size-1">The <a class="has-text-primary" href="{% url 'home' %}">Super Fab Lab</a> is Closed</h1>
+            <h2 class="subtitle is-size-3" id="clockbox"></h2>
+          </div>
+          {% endif %}
+          
+    
+        </div>
+
+        <div class="container">
+          <h2 class="title">Recent Activity (Today)</h2>
+          <div class="table-container has-text-weight-bold is-size-5">
+            <table class="table is-fullwidth">
+              <thead>
+                <tr>
+                  <th>Time In</th>
+                  <th>Time Out</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for trans in todays_transactions %}
+                <tr class="{% if trans.description == 'IN' %}has-background-05{% elif trans.description == 'OUT' %}has-background-background{% endif %}">
+                  <td>{{ trans.enter_time|date:"h:i A" }}</td>
+                  <td>{{ trans.exit_time|date:"h:i A" }}</td>
+                  <td>{{ trans.user.first_name }}</td>
+                  <td>{{ trans.description }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
             </table>
-        </td>
-    </tr>
-</table>
+          </div>
+        </div>
 
-<h2>Recent Activity (today)</h2>
-<table style="width:80%">
-    <tr><th>Time In</th><th>Time Out</th><th>Name</th><th>Description</th></tr>
-    {% for trans in todays_transactions %}
-        <tr class="{{ trans.description }}">
-            <td>{{ trans.enter_time|date:"h:i A" }}</td>
-            <td>{{ trans.exit_time|date:"h:i A" }}</td>
+      </div>
+      <div class="column is-one-fifth">
+        <div class="box has-text-weight-bold is-size-5">
+          <h2 class="title">Info at a glance 👀</h2>
+          <h3 class="title has-text-weight-bold is-size-3"> Current Keyholder: {{ keyholder_name }} </h3>
+          <img src="{{ keyholder_img_url }}"/>
 
-            <td>{{ trans.user.first_name }}</td>
-            <td>{{ trans.description }}</td>
-        </tr>
-    {% endfor %}
-</table>
+          <table class="table is-fullwidth">
+            <tr>
+              <th># in Building</th>
+              <td>{{ number_present }}</td>
+            </tr>
+            <tr>
+              <th>Unique Today</th>
+              <td>{{ unique_visitors_today }}</td>
+            </tr>
+            <tr>
+              <th>Open Printers</th>
+              <td>XX</td>
+            </tr>
+            <tr>
+              <th>Hours (Week)</th>
+              <td>{{weekly_hours|floatformat:1|default_if_none:"0.0"|add:""|floatformat:1}}</td>
+            </tr>
+
+            <tr>
+              <th>Other Fun</th>
+              <td>Stats Here</td>
+            </tr>
+
+
+            
+          </table>
+        </div>
+      </div>
+    </div>
+
+  {% comment %} </div> {% endcomment %}
+
+</section>
+
 
 <script>
-    const form = document.querySelector('form');
-    const loadingIndicator = document.getElementById('loading');
+  const form = document.querySelector('form');
+  const memberIdInput = document.getElementById('member-id-control');
   
-    form.addEventListener('submit', function() {
-      loadingIndicator.style.display = 'block';
-    });
-  </script>
-  
+  form.addEventListener('submit', function() {
+    memberIdInput.classList.add('is-loading');
+  });
+</script>
 
 <script type="text/javascript">
-    const tday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const tmonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const tday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const tmonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-    function GetClock() {
-        const d = new Date();
-        const nday = d.getDay(), nmonth = d.getMonth(), ndate = d.getDate(), nyear = d.getFullYear();
-        let nhour = d.getHours(), nmin = d.getMinutes(), nsec = d.getSeconds(), ap;
+  function GetClock() {
+    const d = new Date();
+    const nday = d.getDay(), nmonth = d.getMonth(), ndate = d.getDate(), nyear = d.getFullYear();
+    let nhour = d.getHours(), nmin = d.getMinutes(), nsec = d.getSeconds(), ap;
 
-        if (nhour == 0) { ap = " AM"; nhour = 12; }
-        else if (nhour < 12) { ap = " AM"; }
-        else if (nhour == 12) { ap = " PM"; }
-        else { ap = " PM"; nhour -= 12; }
+    if (nhour == 0) { ap = " AM"; nhour = 12; }
+    else if (nhour < 12) { ap = " AM"; }
+    else if (nhour == 12) { ap = " PM"; }
+    else { ap = " PM"; nhour -= 12; }
 
-        if (nmin <= 9) nmin = "0" + nmin;
-        if (nsec <= 9) nsec = "0" + nsec;
+    if (nmin <= 9) nmin = "0" + nmin;
+    if (nsec <= 9) nsec = "0" + nsec;
 
-        document.getElementById('clockbox').innerHTML = `${tday[nday]}, ${tmonth[nmonth]} ${ndate}, ${nyear}<br/>${nhour}:${nmin}:${nsec}${ap}`;
+    document.getElementById('clockbox').innerHTML = `${tday[nday]}, ${tmonth[nmonth]} ${ndate}, ${nyear}<br>${nhour}:${nmin}:${nsec}${ap}`;
+  }
+
+  window.onload = function() {
+    GetClock();
+    setInterval(GetClock, 1000);
+  };
+
+  function closeModal($el) {
+    $el.classList.remove('is-active');
+  }
+
+  function closeAllModals() {
+    (document.querySelectorAll('.modal') || []).forEach(($modal) => {
+      closeModal($modal);
+    });
+  }
+
+
+  (document.querySelectorAll('.modal-background, .modal-close, .modal-card-head .delete, .modal-card-foot .button') || []).forEach(($close) => {
+    const $target = $close.closest('.modal');
+
+    $close.addEventListener('click', () => {
+      closeModal($target);
+    });
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if(event.key === "Escape") {
+      closeAllModals();
     }
+  });
 
-    window.onload = function() {
-        GetClock();
-        setInterval(GetClock, 1000);
-    };
+
+
+
 </script>
 {% endblock %}

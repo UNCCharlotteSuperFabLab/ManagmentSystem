@@ -17,6 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.shortcuts import redirect
+from . import views
+
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -24,6 +28,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     path("station/", include("visit_tracking.urls")),
-    path("", lambda request: redirect("station:scan", permanent=False)),
+    path('', views.index, name='home'),
+    path('me/profile', views.profile, name='profile'),
+    path('staff/user_list', views.users_in_space, name = 'user_list')
     
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,14 @@
+{
+    "name": "bulma-docker",
+    "version": "1.0.0",
+    "scripts": {
+        "build-css": "sass superfablab/static/css/custom-bulma.scss superfablab/static/css/custom-bulma.css"
+    },
+    "dependencies": {
+      "bulma": "^1.0.3"
+    },
+    "devDependencies": {
+      "sass": "^1.63.6"
+    }
+  }
+  

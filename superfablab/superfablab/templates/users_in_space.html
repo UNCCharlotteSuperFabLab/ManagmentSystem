@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}SFL - Current Users{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <h1 class="title is-3">Active Users</h1>
+
+        <div class="columns">
+            <div class="column is-four-fifths">
+                <table id="activeUsersTable" class="table is-striped is-hoverable is-fullwidth">
+                    <thead>
+                        <tr>    
+                            <th>User</th>
+                            <th>Method</th>
+                            <th>Quick Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in active_users %}
+                            <tr data-method="{{ user.method }}">
+                                <td>{{ user.user }}</td>
+                                <td>{% if user.method == "in_person" %}Tapped{% else %}Online{% endif%}</td>
+                                <td>
+                                    {% if user.method == "in_person" %}
+                                        <form method="POST", action="/station/scan/">
+                                            {% csrf_token %}
+                                            <input type="hidden" id="barcodeId" name="barcode" value="{{user.user.niner_id}}"/>
+                                            <input type="hidden" id="redirectId" name="redirect" value="{% url 'user_list' %}"/>
+
+                                            <input type="submit" value="Tap out"> 
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+        
+            </div>
+            <div class="column is-one-fifth">
+                <div class="box">
+                    <div class="field">
+                        <label class="label">Filter by Method</label>
+                        <div class="control">
+                            <style>
+                                .filter input[type="radio"] {
+                                    display: none;
+                                  }
+                            </style>
+                            <div class="buttons filter">
+
+                                <label class="button is-primary is-selected">
+                                    <input type="radio" name="methodFilter" value="all" checked>
+                                    All Methods
+                                </label>
+                                <label class="button">
+                                    <input type="radio" name="methodFilter" value="online">
+                                    Signed in Online
+                                </label>
+                                <label class="button">
+                                    <input type="radio" name="methodFilter" value="in_person">
+                                    Tapped in
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Initialize DataTables for sorting, searching, and pagination -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize DataTable
+            $('#activeUsersTable').DataTable();
+            const methodFilter = document.getElementById("methodFilter");
+            const tableRows = document.querySelectorAll("#activeUsersTable tbody tr");
+
+            const radios = document.querySelectorAll('input[name="methodFilter"]');
+
+            radios.forEach(radio => {
+                radio.addEventListener("change", () => {
+                    // Remove the active class from all labels
+                    document.querySelectorAll('.button').forEach(label => {
+                        label.classList.remove('is-selected');
+                        label.classList.remove('is-primary');
+
+                    });
+    
+                    // Add the active class to the selected radio button's label
+                    const selectedLabel = radio.closest('label');
+                    selectedLabel.classList.add('is-selected');
+                    selectedLabel.classList.add('is-primary');
+
+                    selectedMethod = radio.value;
+                    
+                    tableRows.forEach(row => {
+                        const rowMethod = row.getAttribute("data-method");
+                        if (selectedMethod === "all" || rowMethod === selectedMethod) {
+                            row.style.display = ""; // Show row
+                        } else {
+                            row.style.display = "none"; // Hide row
+                        }
+                    });
+    
+
+                });
+            });
+        });
+
+    </script>
+
+{% endblock %}

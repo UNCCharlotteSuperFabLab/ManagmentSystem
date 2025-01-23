@@ -4,6 +4,10 @@ import requests
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.core.validators import FileExtensionValidator
+
+from django.utils.timezone import now, localtime
+
 
 from typing import Dict, Tuple
 
@@ -47,6 +51,12 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.TextField(blank=True, null=True)
     last_name = models.TextField(blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
+    user_picture = models.ImageField(
+        upload_to='profile_pictures/',
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])]
+    )
 
     
     USERNAME_FIELD="niner_id"
@@ -69,6 +79,14 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.get_full_name()
     
+    def __eq__(self, value):
+        if isinstance(value, SpaceUser):
+            return self.niner_id == value.niner_id
+        return False
+
+    def __hash__(self):
+        return hash(self.niner_id)
+    
     def __repr__(self):
         return f"space_user({self.niner_id}, {self.first_name}, {self.last_name}, {self.email}, {self.canvas_id})" + super().__repr__()
     
@@ -86,6 +104,7 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
         response = requests.post(url, headers=headers, json=data)
         if response.status_code == 200:
             val_dic = response.json()
+            print(val_dic)
             if not val_dic.get("user", None):
                 return self
             self.first_name = val_dic["user"]["firstName"]
@@ -114,3 +133,25 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
         else:
             self.save()
             return self
+        
+class Keyholder(models.Model):
+    user = models.OneToOneField(SpaceUser, on_delete=models.CASCADE, related_name="keyholder")
+    is_keyholder = models.BooleanField()
+    priority = models.IntegerField(default=0)
+
+class KeyolderHistoryManager(models.Manager):
+    def get_current_keyholder(self) -> KeyholderHistory:
+        return KeyholderHistory.objects.filter(exit_time__isnull=True).order_by('-start_time').first()
+    def is_keyholder(self, user:SpaceUser) -> bool:
+        return user.keyholder.is_keyholder
+    def create_keyholder_history(self, user:SpaceUser) -> KeyholderHistory:
+        if self.is_keyholder(user):
+            keyholder_history = self.create(keyholder=user, start_time=now())
+            return keyholder_history
+        else:
+            raise ValueError("user must be a keyholder")
+class KeyholderHistory(models.Model):
+    keyholder = models.ForeignKey(SpaceUser, on_delete=models.CASCADE, related_name="keyholder_history")
+    start_time = models.DateTimeField()
+    exit_time = models.DateTimeField(null=True, blank=True)
+    objects = KeyolderHistoryManager()

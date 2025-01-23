@@ -1,0 +1,31 @@
+
+{% extends "base.html" %}
+
+{% block title %}SFL - Homepage{% endblock %}
+
+{% block content %}
+
+<div class='container'>
+    <div class='columns is-centered'>
+        <div class='column is-third has-text-centered'>
+            <a href={% url 'home' %}><img src="/media/sfltag.png" /></a>
+            <h1 class="title is-1"> Welcome to the <span class="has-text-primary">SUPER FAB LAB</span> Homepage </h1>
+        </div>
+    </div>
+</div>
+
+<div class='section'>
+    <div class="grid">
+        <div class="cell">
+            <a class="button is-fullwidth" href="/station/scan">GO TO STATION</a>
+        </div>
+        {% if user.is_staff %}
+            <div class="cell">
+                <a class="button is-fullwidth" href="{% url 'user_list'%}">View current users</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+
+{% endblock content %}
