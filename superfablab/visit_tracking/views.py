@@ -91,7 +91,11 @@ def scan(request):
                 return redirect("station:scan")
             else:
                 current_keyholder_modal = True
-        elif not Visit.objects.filter(user=user, still_in_the_space=True).exists() and not dont_override and user.keyholder and user.keyholder.priority > current_keyholder.keyholder.keyholder.priority:
+        elif not Visit.objects.filter(user=user, still_in_the_space=True).exists() \
+            and not dont_override\
+            and hasattr(user, 'keyholder')\
+            and user.keyholder\
+            and user.keyholder.priority > current_keyholder.keyholder.keyholder.priority:
             first_keyholder_modal = True
         else:
             print("scanning")
