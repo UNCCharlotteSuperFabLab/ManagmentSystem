@@ -16,6 +16,22 @@
     <script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.2.1/js/dataTables.bulma.js"></script>
 
+    <style>
+      :root {
+        --bulma-primary-h: 47deg;
+        --bulma-primary-s: 26%;
+        --bulma-primary-l: 52%;
+        --bulma-link-h: 182deg;
+        --bulma-link-l: 23%;
+        --bulma-success-h: 160deg;
+        --bulma-success-s: 100%;
+        --bulma-success-l: 16%;
+        --bulma-scheme-h: 50;
+        --bulma-scheme-s: 69%;
+        --bulma-light-l: 82%;
+      }
+    </style>
+
 
 
     <title>{% block title %}Super Fab Lab{% endblock %}</title>
@@ -24,7 +40,7 @@
     {% block header %}
     <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
-          <a class="navbar-item" href="/">Home</a>
+          <a class="navbar-item" href={% url 'home' %}><img src="/media/sfltag.png" /></a>
       
           <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
             <span aria-hidden="true"></span>
