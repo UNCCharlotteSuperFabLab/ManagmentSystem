@@ -23,14 +23,14 @@
                                 <td>{{ user.user }}</td>
                                 <td>{% if user.method == "in_person" %}Tapped{% else %}Online{% endif%}</td>
                                 <td>
-                                    {% if user.method == "in_person" %}
+                                    {% if user.method == "in_person" and user.user.niner_id != keyholder.keyholder.niner_id %}
                                         <form method="POST", action="/station/scan/">
                                             {% csrf_token %}
                                             <input type="hidden" id="barcodeId" name="barcode" value="{{user.user.niner_id}}"/>
                                             <input type="hidden" id="redirectId" name="redirect" value="{% url 'user_list' %}"/>
 
                                             <input type="submit" value="Tap out"> 
-                                        </form>
+                                        </form>                                    
                                     {% endif %}
                                 </td>
                             </tr>
