@@ -143,7 +143,8 @@ class KeyolderHistoryManager(models.Manager):
     def get_current_keyholder(self) -> KeyholderHistory:
         return KeyholderHistory.objects.filter(exit_time__isnull=True).order_by('-start_time').first()
     def is_keyholder(self, user:SpaceUser) -> bool:
-        return user.keyholder.is_keyholder
+        return hasattr(user, 'keyholder') and user.keyholder.is_keyholder
+    
     def create_keyholder_history(self, user:SpaceUser) -> KeyholderHistory:
         if self.is_keyholder(user):
             keyholder_history = self.create(keyholder=user, start_time=now())
