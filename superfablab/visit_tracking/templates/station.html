@@ -8,6 +8,41 @@
 
 {% block content %}
 
+
+<div id="loading-indicator" class="modal">
+  <style>
+    .loader-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .loader {
+      border: 6px solid rgba(0, 0, 0, 0.1);
+      border-top-color: #00d1b2; /* Bulma primary color */
+      border-radius: 50%;
+      width: 80px; /* Adjust size */
+      height: 80px; /* Adjust size */
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    </style>    
+  <div class="modal-background"></div>
+  <div class="modal-content has-text-centered">
+    <div class="loader-wrapper">
+      <div class="loader"></div>
+      <p class="has-text-white mt-4">Fetching User Data...</p>
+    </div>
+  </div>
+</div>
+
+
 {% if first_keyholder_modal %}
 <div id="first_keyholder_modal_id" class="modal is-active">
   <div class="modal-background"></div>
@@ -246,11 +281,19 @@
 
 
 <script>
+  function toggleLoadingIndicator(show) {
+    const modal = document.getElementById('loading-indicator');
+    if (show) {
+      modal.classList.add('is-active');
+    } else {
+      modal.classList.remove('is-active');
+    }
+  }  
   const form = document.querySelector('form');
   const memberIdInput = document.getElementById('member-id-control');
   
   form.addEventListener('submit', function() {
-    memberIdInput.classList.add('is-loading');
+    toggleLoadingIndicator(true);
   });
 </script>
 
@@ -273,6 +316,8 @@
 
     document.getElementById('clockbox').innerHTML = `${tday[nday]}, ${tmonth[nmonth]} ${ndate}, ${nyear}<br>${nhour}:${nmin}:${nsec}${ap}`;
   }
+
+  
 
   window.onload = function() {
     GetClock();
