@@ -32,6 +32,19 @@ def close_space(request):
             visit.save()
     return redirect('station:scan')
 
+def set_forgot(request):
+    if request.method == 'POST' and 'barcode' in request.POST:
+        barcode = request.POST['barcode']
+        visit = Visit.objects.filter(still_in_the_space=True, user__niner_id=barcode).first()
+        visit.forgot_to_signout = True
+        visit.still_in_the_space = False
+        visit.exit_time = now()
+        visit.save()
+        redirect_val = request.POST.get('redirect', None)
+        if redirect_val:
+            return redirect(redirect_val)
+    return redirect('station:scan')
+
 def scan(request):
     first_keyholder_modal = False
     current_keyholder_modal = False
