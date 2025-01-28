@@ -19,7 +19,7 @@
         <div class="cell">
             <a class="button is-fullwidth" href="/station/scan">GO TO STATION</a>
         </div>
-        {% if user.is_staff %}
+        {% if user_can_open_space %}
             <div class="cell">
                 <a class="button is-fullwidth" href="{% url 'user_list'%}">View current users</a>
             </div>

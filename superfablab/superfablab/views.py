@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, user_passes_test
 from django.http import HttpResponse
 from django.contrib.sessions.models import Session
 from django.utils import timezone
@@ -7,10 +7,19 @@ from django.contrib.auth import get_user_model
 
 from users.models import KeyholderHistory
 
-import django_filters
+
+def staff_required(view_func):
+    return user_passes_test(lambda u: hasattr(u, "keyholder") and u.keyholder.is_keyholder)(view_func)
+
+def open_required(view_func):
+    return user_passes_test(lambda u: hasattr(u, "keyholder"))(view_func)
 
 def index(request):
-    return render(request, 'index.html')
+    print(hasattr(request.user, "keyholder"))
+    context ={
+        'user_can_open_space': hasattr(request.user, "keyholder")
+    }
+    return render(request, 'index.html', context)
 
 def profile(request):
     return coming_soon(request)
@@ -19,9 +28,7 @@ def profile(request):
 def coming_soon(request):
     return render(request, 'coming_soon.html')
 
-
-
-@permission_required("SpaceUser.view")
+@open_required
 def users_in_space(request):
     current_keyholder = KeyholderHistory.objects.get_current_keyholder()
 
