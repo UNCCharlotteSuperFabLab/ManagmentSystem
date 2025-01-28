@@ -38,7 +38,7 @@ services:
       - NINER_ENGAGE_PAYLOAD_TOKEN=${NINER_ENGAGE_PAYLOAD_TOKEN}
       - CANVAS_API_KEY=${CANVAS_API_KEY}
     ports:
-      - "8000:8000"
+      - "80:8000"
 
   node:
     image: node:18
