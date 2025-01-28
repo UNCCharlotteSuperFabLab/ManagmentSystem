@@ -66,7 +66,7 @@ def scan(request):
                         if request.POST.get("sign_out_current_keyholder", None) == "true":
                             Visit.objects.filter(user=current_keyholder.keyholder, still_in_the_space=True).update(still_in_the_space=False, exit_time=now())
                 except ValueError as e:
-                    return render(request, 'status/error.html', {"error": "{e}"}, status=504)
+                    return render(request, 'status/error.html', {"error": e}, status=504)
                 return redirect('station:scan')
             else:
                 dont_override = True

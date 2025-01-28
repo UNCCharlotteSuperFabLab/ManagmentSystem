@@ -150,7 +150,7 @@ class KeyolderHistoryManager(models.Manager):
             keyholder_history = self.create(keyholder=user, start_time=now())
             return keyholder_history
         else:
-            raise ValueError("user must be a keyholder")
+            raise ValueError("User must be a keyholder")
 class KeyholderHistory(models.Model):
     keyholder = models.ForeignKey(SpaceUser, on_delete=models.CASCADE, related_name="keyholder_history")
     start_time = models.DateTimeField()
