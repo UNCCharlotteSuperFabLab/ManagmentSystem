@@ -82,8 +82,10 @@
         {% if keyholders_list %}
           <div class="content">
             <ul>
-              {% for keyholder in keyholders_list %}
-                <li><strong>{{ keyholder.user }}</strong></li>
+              {% for keyholder_item in keyholders_list %}
+                {% if keyholder_item.user.niner_id != keyholder.keyholder.niner_id %}
+                  <li><strong>{{ keyholder_item.user }}</strong></li>
+                {% endif %}
               {% endfor %}
             </ul>
           </div>
