@@ -1,14 +1,25 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, user_passes_test
 from django.http import HttpResponse
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 
-import django_filters
+from users.models import KeyholderHistory
+
+
+def staff_required(view_func):
+    return user_passes_test(lambda u: hasattr(u, "keyholder") and u.keyholder.is_keyholder)(view_func)
+
+def open_required(view_func):
+    return user_passes_test(lambda u: hasattr(u, "keyholder"))(view_func)
 
 def index(request):
-    return render(request, 'index.html')
+    print(hasattr(request.user, "keyholder"))
+    context ={
+        'user_can_open_space': hasattr(request.user, "keyholder")
+    }
+    return render(request, 'index.html', context)
 
 def profile(request):
     return coming_soon(request)
@@ -17,10 +28,10 @@ def profile(request):
 def coming_soon(request):
     return render(request, 'coming_soon.html')
 
-
-
-@permission_required("SpaceUser.view")
+@open_required
 def users_in_space(request):
+    current_keyholder = KeyholderHistory.objects.get_current_keyholder()
+
     users_from_last_login = get_user_model().objects.filter(last_login__date=timezone.now().date())
     users_from_activity_logs = get_user_model().objects.filter(visit__still_in_the_space=True).distinct()
 
@@ -33,9 +44,12 @@ def users_in_space(request):
         if not any(u["user"] == user for u in active_users):
             active_users.append({"user": user, "method": "online"})
 
-    
+    context = {
+        "active_users": active_users, 
+        "keyholder": current_keyholder
+    }
 
-    return render(request, "users_in_space.html", {"active_users": active_users})
+    return render(request, "users_in_space.html", context)
 
 
 

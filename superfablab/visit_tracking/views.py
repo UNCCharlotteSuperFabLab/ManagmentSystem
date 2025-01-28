@@ -66,7 +66,7 @@ def scan(request):
                         if request.POST.get("sign_out_current_keyholder", None) == "true":
                             Visit.objects.filter(user=current_keyholder.keyholder, still_in_the_space=True).update(still_in_the_space=False, exit_time=now())
                 except ValueError as e:
-                    return render(request, 'status/error.html', {"error": "{e}"}, status=504)
+                    return render(request, 'status/error.html', {"error": e}, status=504)
                 return redirect('station:scan')
             else:
                 dont_override = True
@@ -106,7 +106,7 @@ def scan(request):
         
         # return redirect('station:scan')
     
-    today_start = localtime(now()).replace(hour=0, minute=0, second=0, microsecond=0)
+    today_start = localtime(now()).replace(hour=4, minute=0, second=0, microsecond=0)
     today_end = today_start + timedelta(days=1)
 
     todays_transactions = Visit.objects.annotate(
