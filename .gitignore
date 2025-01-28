@@ -161,7 +161,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-
+superfablab/media/profile_pictures/*
 
 node_modules/
 package-lock.json
