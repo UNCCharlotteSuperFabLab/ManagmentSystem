@@ -12,15 +12,14 @@ from visit_tracking.models import Visit
 
 
 def staff_required(view_func):
-    return user_passes_test(lambda u: hasattr(u, "keyholder") and u.keyholder.is_keyholder)(view_func)
+    return user_passes_test(lambda u: u.space_level >= get_user_model().SpaceLevel.KEYHOLDER)(view_func)
 
 def open_required(view_func):
-    return user_passes_test(lambda u: hasattr(u, "keyholder"))(view_func)
+    return user_passes_test(lambda u: u.space_level >= get_user_model().SpaceLevel.VOLUNTEER)(view_func)
 
 def index(request):
-    print(hasattr(request.user, "keyholder"))
     context ={
-        'user_can_open_space': hasattr(request.user, "keyholder")
+        'user_can_open_space': request.user.space_level >= get_user_model().SpaceLevel.VOLUNTEER
     }
     return render(request, 'index.html', context)
 

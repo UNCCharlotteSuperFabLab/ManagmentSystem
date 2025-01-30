@@ -8,6 +8,7 @@
 
 {% block content %}
 
+{{ currentkeyholderorvolunter }}
 
 <div id="loading-indicator" class="modal">
   <style>
@@ -52,11 +53,12 @@
       <button class="delete" aria-label="close"></button>
     </header>
     <section class="modal-card-body">
-      {% if keyholder and user.keyholder.priority > keyholder.priority %}
+      {% if keyholder and user.keyholder_priority > keyholder.keyholder_priority %}
         <p class="title is-size-3">Scan to confirm taking over keyholder from {{keyholder_name}}</p>
         <p>Make sure to let them know</p>
       {% else %}
-        <p class="title is-size-3">Scan to confirm becoming keyholder</p>
+        <p class="title is-size-3">Scan to confirm becoming {% if userkeyholderorvolunter %} keyholder {% else %} volunteer {% endif %}</p>
+        {{ userkeyholderorvolunter }}
       {% endif%}
 
       <form action="{% url 'station:scan' %}" method="post">
@@ -73,7 +75,7 @@
               type="text" 
               name="barcode" 
               autofocus 
-              placeholder="Keyholder ID" />
+              placeholder="Scan Card Again" />
           </div>
         </div>
       </form>
@@ -156,7 +158,7 @@
           id="member_id" 
           type="hidden" 
           name="barcode"
-          value="{{keyholder.keyholder.niner_id}}"/>
+          value="{{keyholder.niner_id}}"/>
           <input type="submit" class="button is-danger" value="Close Space">
         </form>
         <button class="button">Cancel</button>
@@ -197,7 +199,7 @@
           
 
           <!-- Welcome Message -->
-          {% if keyholder_name %}
+          {% if currentkeyholderorvolunter %}
           <div class="column has-text-centered">
             <h1 class="title has-text-weight-bold is-size-1">Welcome to the <a class="has-text-primary" href="{% url 'home' %}">Super Fab Lab</a></h1>
             <h2 class="subtitle is-size-3" id="clockbox"></h2>
@@ -242,7 +244,7 @@
       <div class="column is-one-fifth">
         <div class="box has-text-weight-bold is-size-5">
           <h2 class="title">Info at a glance 👀</h2>
-          <h3 class="title has-text-weight-bold is-size-3"> Current Keyholder: {{ keyholder_name }} </h3>
+          <h3 class="title has-text-weight-bold is-size-3"> Current {% if currentkeyholderorvolunter %} Keyholder {% else %} Volunteer {% endif %}: {{ keyholder_name }} </h3>
           <img src="{{ keyholder_img_url }}"/>
 
           <table class="table is-fullwidth">
