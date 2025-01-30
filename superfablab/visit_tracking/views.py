@@ -78,7 +78,7 @@ def assign_keyholder(user, request):
         history.save()
     
     if request.POST.get("sign_out_current_keyholder", None) == "true":
-        Visit.objects.filter(user=current_keyholder.keyholder, still_in_the_space=True).update(still_in_the_space=False, exit_time=now())
+        Visit.objects.filter(user=current_keyholder, still_in_the_space=True).update(still_in_the_space=False, exit_time=now())
     
     return redirect('station:scan')
 
