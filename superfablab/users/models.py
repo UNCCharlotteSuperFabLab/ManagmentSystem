@@ -57,7 +57,15 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
         null=True,
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])]
     )
-
+    
+    class SpaceLevel(models.IntegerChoices):
+        USER = 0
+        VOLUNTEER = 30
+        KEYHOLDER = 70
+        STAFF = 100
+    
+    space_level = models.IntegerField(choices=SpaceLevel.choices, default=SpaceLevel.USER)
+    keyholder_priority = models.IntegerField(default=-10)
     
     USERNAME_FIELD="niner_id"
     
@@ -133,20 +141,16 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
         else:
             self.save()
             return self
-        
-class Keyholder(models.Model):
-    user = models.OneToOneField(SpaceUser, on_delete=models.CASCADE, related_name="keyholder")
-    is_keyholder = models.BooleanField()
-    priority = models.IntegerField(default=0)
 
 class KeyolderHistoryManager(models.Manager):
     def get_current_keyholder(self) -> KeyholderHistory:
         return KeyholderHistory.objects.filter(exit_time__isnull=True).order_by('-start_time').first()
     def is_keyholder(self, user:SpaceUser) -> bool:
-        return hasattr(user, 'keyholder') and user.keyholder.is_keyholder
-    
+        return user.space_level >= user.SpaceLevel.KEYHOLDER  
+    def can_open(self, user:SpaceUser) -> bool:
+        return user.space_level >= user.SpaceLevel.VOLUNTEER
     def create_keyholder_history(self, user:SpaceUser) -> KeyholderHistory:
-        if self.is_keyholder(user):
+        if self.can_open(user):
             keyholder_history = self.create(keyholder=user, start_time=now())
             return keyholder_history
         else:
