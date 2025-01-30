@@ -4,8 +4,11 @@ from django.http import HttpResponse
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.utils.timezone import now, timedelta
+
 
 from users.models import KeyholderHistory
+from visit_tracking.models import Visit
 
 
 def staff_required(view_func):
@@ -22,8 +25,24 @@ def index(request):
     return render(request, 'index.html', context)
 
 def profile(request):
-    return coming_soon(request)
+    visits = Visit.objects.filter(user__niner_id=request.user.niner_id).order_by('-enter_time')
+    
+    one_week_ago = now() - timedelta(weeks=1)
 
+    last_week_visits = Visit.objects.filter(user__niner_id=request.user.niner_id, enter_time__gte=one_week_ago, still_in_the_space=False).exclude(forgot_to_signout=True)
+    
+    last_week_hours = sum((visit.exit_time - visit.enter_time).total_seconds() for visit in last_week_visits) / 3600
+    total_hours = sum((visit.exit_time - visit.enter_time).total_seconds() for visit in visits) / 3600
+
+    
+    context = {
+        'all_time_visits':visits,
+        'total_hours':total_hours,
+        'last_week_visits':last_week_visits,
+        'last_week_hours':last_week_hours
+    }
+    
+    return render(request, 'profile.html', context)
 
 def coming_soon(request):
     return render(request, 'coming_soon.html')

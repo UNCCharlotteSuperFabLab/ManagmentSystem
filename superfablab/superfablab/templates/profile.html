@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="columns is-centered">
+    <div class="column is-two-thirds">
+        <h1 class="title is-1 is-centered"> Hello, {{ user }} </h1>
+
+        Hours this week: {{ last_week_hours |floatformat:1|default_if_none:"0.0"|add:""|floatformat:1 }}
+        All time Hours:  {{ total_hours |floatformat:1|default_if_none:"0.0"|add:""|floatformat:1}}
+
+        <h1 class= "is-3"> Recent Sign ins </h2>
+
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <td class=""> Enter_time </td>
+                    <td class=""> Exit_time </td>
+                    <td class=""> Forgot to Signout</td>
+                </thead>
+                {% for visit in all_time_visits %}
+                    <tr>
+                        <td class=""> {{ visit.enter_time }} </td>
+                        <td class=""> {{ visit.exit_time }} </td>
+                        <td class=""> {% if visit.forgot_to_signout %} YES {% else %} NO {% endif %} </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+{% endblock content%}
