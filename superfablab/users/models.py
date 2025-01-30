@@ -103,13 +103,13 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
             print(f"Values Already set, shouldnt have run")
             return self
         url = "https://ninerengage.charlotte.edu/api/discovery/swipe/attendance"
-        headers = {"Cookie": os.getenv("NINER_ENGAGE_COOKIE"),
-               "X-Xsrf-Token": os.getenv("NINER_ENGAGE_TOKEN")}
+        cookies = {cookie.split("=")[0]: cookie.split("=")[1] for cookie in os.getenv("NINER_ENGAGE_COOKIE").split("; ")}
+        headers = {"X-Xsrf-Token": os.getenv("NINER_ENGAGE_TOKEN")}
         data = {
             "swipe": self.niner_id,
             "token": os.getenv("NINER_ENGAGE_PAYLOAD_TOKEN")
         }
-        response = requests.post(url, headers=headers, json=data)
+        response = requests.post(url, headers=headers, cookies=cookies, json=data)
         if response.status_code == 200:
             val_dic = response.json()
             print(val_dic)
