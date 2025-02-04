@@ -162,10 +162,6 @@ def new_user_form(request, niner_id):
     # Fetch the user or create a placeholder
     user = SpaceUser.objects.filter(niner_id=niner_id).first()
     
-    if not user.first_name or not user.last_name or not user.email:
-        user.niner_engage_get_updated_values()
-
-    
     # Example: Fetch the first name from another source (replace with your logic)
 
     if request.method == 'POST':

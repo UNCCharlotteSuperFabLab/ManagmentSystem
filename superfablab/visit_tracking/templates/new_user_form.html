@@ -19,7 +19,7 @@
             <div class="field">
               <label for="id_first_name" class="label">First Name</label>
               <div class="control">
-                <input type="text" name="first_name" class="input"  required id="id_first_name" value="{{first_name}}">
+                <input type="text" name="first_name" class="input"  required id="id_first_name" {% if first_name %} value="{{first_name}} {% endif %}" autofocus>
               </div>
             </div>  
 
@@ -27,7 +27,7 @@
             <div class="field">
               <label for="id_last_name" class="label">Last Name</label>
               <div class="control">
-                <input type="text" name="last_name" class="input" required id="id_last_name" value="{{last_name}}"">
+                <input type="text" name="last_name" class="input" required id="id_last_name" {% if last_name %} value="{{last_name}}" {% endif %}>
               </div>
             </div>
 
@@ -35,7 +35,7 @@
             <div class="field">
                 <label for="id_email" class="label">@charlotte.edu email</label>
                 <div class="control">
-                  <input type="email" name="email" class="input" required id="id_email" value="{{ email }}">
+                  <input type="email" name="email" class="input" required id="id_email" {% if email %} value="{{ email }}" {% endif %} >
                 </div>
               </div>
 

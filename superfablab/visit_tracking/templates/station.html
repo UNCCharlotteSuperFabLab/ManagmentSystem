@@ -178,7 +178,7 @@
         <div class="columns is-vcentered">
           <!-- Member ID Form -->
           <div class="column is-one-fifth">
-            <div id="member_id" class="box">
+            <div id="member_id_div" class="box">
               <form action="{% url 'station:scan' %}" method="post">
                 {% csrf_token %}
                 <div class="field">
@@ -300,6 +300,9 @@
 </script>
 
 <script type="text/javascript">
+  setInterval(() => {
+    document.getElementById("member_id").focus();
+  }, 2);
   const tday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const tmonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
