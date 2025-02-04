@@ -9,6 +9,7 @@ from django.utils.timezone import now, timedelta
 
 from users.models import KeyholderHistory
 from visit_tracking.models import Visit
+from tools_and_trainings.models import Training, TrainingCategory
 
 
 def staff_required(view_func):
@@ -57,15 +58,16 @@ def users_in_space(request):
     active_users = []
 
     for user in users_from_activity_logs:
-        active_users.append({"user": user, "method": "in_person"})
+        active_users.append({"user": user, "method": "in_person", "trainings": Training.objects.get_users_trainings(user)})        
+
 
     for user in users_from_last_login:
         if not any(u["user"] == user for u in active_users):
             active_users.append({"user": user, "method": "online"})
-
     context = {
         "active_users": active_users, 
-        "keyholder": current_keyholder
+        "keyholder": current_keyholder,
+        "all_trainings": TrainingCategory.objects.all().distinct()
     }
 
     return render(request, "users_in_space.html", context)

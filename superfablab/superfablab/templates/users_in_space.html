@@ -13,33 +13,43 @@
                     <thead>
                         <tr>    
                             <th>User</th>
-                            <th>Method</th>
+                            <th>Trainings</th>
                             <th>Quick Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for user in active_users %}
-                            <tr data-method="{{ user.method }}">
+                            <tr data-method="{{ user.method }}" data-trainings="{% for training in user.trainings %}{{ training.category.name }} {% endfor %}">>
                                 <td>{{ user.user }}</td>
-                                <td>{% if user.method == "in_person" %}Tapped{% else %}Online{% endif%}</td>
                                 <td>
+                                    <div class="field is-grouped is-grouped-multiline">
+                                    {% for training in user.trainings%}
+                                    <div class="control">
+                                        <div class="tags has-addons">
+                                            <span class="tag" style="background-color: {{ training.hex_color }}"> {{ training.category.name_readable }} </span>
+                                            <span class="tag">
+                                                <span class="icon">
+                                                    <i class="fas {{ training.icon }}"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    {% endfor%}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="buttons">
                                     {% if user.method == "in_person" and user.user.niner_id != keyholder.keyholder.niner_id %}
                                            
-                                        <form method="POST", action="/station/set_forgot/">
+                                        <form method="POST", action="/station/set_forgot/" style="display:block;">
                                             {% csrf_token %}
                                             <input type="hidden" id="barcodeId" name="barcode" value="{{user.user.niner_id}}"/>
                                             <input type="hidden" id="redirectId" name="redirect" value="{% url 'user_list' %}"/>
 
-                                            <input type="submit" value="Set Forgot"> 
-                                        </form>                        
-                                        <form method="POST", action="/station/scan/">
-                                            {% csrf_token %}
-                                            <input type="hidden" id="barcodeId" name="barcode" value="{{user.user.niner_id}}"/>
-                                            <input type="hidden" id="redirectId" name="redirect" value="{% url 'user_list' %}"/>
-
-                                            <input type="submit" value="Tap out"> 
-                                        </form>           
+                                            <input type="submit" class="button is-warning" value="Set Forgot"> 
+                                        </form>                          
                                     {% endif %}
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -50,31 +60,25 @@
             <div class="column is-one-fifth">
                 <div class="box">
                     <div class="field">
-                        <label class="label">Filter by Method</label>
-                        <div class="control">
+                        <label class="label">Filter by Training</label>
+                        <div class="buttons filter" id="trainingFilters">
                             <style>
                                 .filter input[type="radio"] {
                                     display: none;
                                   }
                             </style>
-                            <div class="buttons filter">
-
-                                <label class="button is-primary is-selected">
-                                    <input type="radio" name="methodFilter" value="all" checked>
-                                    All Methods
-                                </label>
-                                <label class="button">
-                                    <input type="radio" name="methodFilter" value="online">
-                                    Signed in Online
-                                </label>
-                                <label class="button">
-                                    <input type="radio" name="methodFilter" value="in_person">
-                                    Tapped in
-                                </label>
-                            </div>
+                            <label class="button is-primary is-selected">
+                                <input type="radio" name="trainingFilter" value="all" checked>
+                                All Trainings
+                            </label>
+                            {% for training in all_trainings %}
+                            <label class="button">
+                                <input type="radio" name="trainingFilter" value="{{ training.name }}">
+                                {{ training.name_readable }}
+                            </label>
+                            {% endfor %}
                         </div>
                     </div>
-                
                 </div>
             </div>
         </div>
@@ -85,39 +89,36 @@
     <!-- Initialize DataTables for sorting, searching, and pagination -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize DataTable
             $('#activeUsersTable').DataTable();
-            const methodFilter = document.getElementById("methodFilter");
+            
             const tableRows = document.querySelectorAll("#activeUsersTable tbody tr");
+            const trainingRadios = document.querySelectorAll('input[name="trainingFilter"]');
+            const allRadios = [...trainingRadios];
 
-            const radios = document.querySelectorAll('input[name="methodFilter"]');
+            function applyFilters() {
+                const selectedTraining = document.querySelector('input[name="trainingFilter"]:checked').value;
+                
+                tableRows.forEach(row => {
+                    const rowTrainings = row.getAttribute("data-trainings").split(" ");
+                    
+                    const trainingMatch = selectedTraining === "all" || rowTrainings.includes(selectedTraining);
+                    
+                    row.style.display = trainingMatch ? "" : "none";
+                });
+            }
 
-            radios.forEach(radio => {
+            allRadios.forEach(radio => {
                 radio.addEventListener("change", () => {
-                    // Remove the active class from all labels
                     document.querySelectorAll('.button').forEach(label => {
                         label.classList.remove('is-selected');
                         label.classList.remove('is-primary');
-
                     });
-    
-                    // Add the active class to the selected radio button's label
+                    
                     const selectedLabel = radio.closest('label');
                     selectedLabel.classList.add('is-selected');
                     selectedLabel.classList.add('is-primary');
-
-                    selectedMethod = radio.value;
                     
-                    tableRows.forEach(row => {
-                        const rowMethod = row.getAttribute("data-method");
-                        if (selectedMethod === "all" || rowMethod === selectedMethod) {
-                            row.style.display = ""; // Show row
-                        } else {
-                            row.style.display = "none"; // Hide row
-                        }
-                    });
-    
-
+                    applyFilters();
                 });
             });
         });
