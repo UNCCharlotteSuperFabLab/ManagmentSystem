@@ -97,32 +97,7 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
     
     def __repr__(self):
         return f"space_user({self.niner_id}, {self.first_name}, {self.last_name}, {self.email}, {self.canvas_id})" + super().__repr__()
-    
-    def niner_engage_get_updated_values(self) -> SpaceUser:
-        if self.first_name and self.last_name and self.email:
-            print(f"Values Already set, shouldnt have run")
-            return self
-        url = "https://ninerengage.charlotte.edu/api/discovery/swipe/attendance"
-        cookies = {cookie.split("=")[0]: cookie.split("=")[1] for cookie in os.getenv("NINER_ENGAGE_COOKIE").split("; ")}
-        headers = {"X-Xsrf-Token": os.getenv("NINER_ENGAGE_TOKEN")}
-        data = {
-            "swipe": self.niner_id,
-            "token": os.getenv("NINER_ENGAGE_PAYLOAD_TOKEN")
-        }
-        response = requests.post(url, headers=headers, cookies=cookies, json=data)
-        if response.status_code == 200:
-            val_dic = response.json()
-            print(val_dic)
-            if not val_dic.get("user", None):
-                return self
-            self.first_name = val_dic["user"]["firstName"]
-            self.last_name = val_dic["user"]["lastName"]
-            self.email = val_dic["user"]["campusEmail"]
-            self.save()
-        else:
-            print(f"response: {response.status_code} -- {response.text}")
-        return self
-    
+        
     def get_canvas_id_from_canvas(self) -> SpaceUser:
         if self.canvas_id:
             return self
