@@ -26,13 +26,13 @@ class TrainingManager(models.Manager):
         return trainings
 class Training(models.Model):
     class TrainingLevels(models.IntegerChoices):
-        RED_DOT = 0
-        GREEN_DOT = 30
-        BLUE_DOT = 70
-        YELLOW_DOT = 100
+        APPRENTICE = 0
+        OPERATOR = 30
+        TRAINER = 70
+        CERTIFIER = 100
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="trainings")
     category = models.ForeignKey(TrainingCategory, on_delete=models.PROTECT, related_name="trainings")
-    training_level = models.IntegerField(choices=TrainingLevels.choices, default=TrainingLevels.RED_DOT)
+    training_level = models.IntegerField(choices=TrainingLevels.choices, default=TrainingLevels.APPRENTICE)
     certifier = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name="given_trainings")
     completed_on = models.DateTimeField(auto_now_add=True)
     objects = TrainingManager()
@@ -40,13 +40,13 @@ class Training(models.Model):
     @property
     def hex_color(self):
         match self.training_level:
-            case Training.TrainingLevels.RED_DOT:
+            case Training.TrainingLevels.APPRENTICE:
                 return "#C33D2A"
-            case Training.TrainingLevels.GREEN_DOT:
+            case Training.TrainingLevels.OPERATOR:
                 return "#3E9955"
-            case Training.TrainingLevels.BLUE_DOT:
+            case Training.TrainingLevels.TRAINER:
                 return "#1F70B8"
-            case Training.TrainingLevels.YELLOW_DOT:
+            case Training.TrainingLevels.CERTIFIER:
                 return "#D1A300"
             case _:
                 return "#FFFFFF"
@@ -54,13 +54,13 @@ class Training(models.Model):
     @property
     def icon(self):
         match self.training_level:
-            case Training.TrainingLevels.RED_DOT:
+            case Training.TrainingLevels.APPRENTICE:
                 return "fa-shoe-prints"
-            case Training.TrainingLevels.GREEN_DOT:
+            case Training.TrainingLevels.OPERATOR:
                 return "fa-dumbbell"
-            case Training.TrainingLevels.BLUE_DOT:
+            case Training.TrainingLevels.TRAINER:
                 return "fa-medal"
-            case Training.TrainingLevels.YELLOW_DOT:
+            case Training.TrainingLevels.CERTIFIER:
                 return "fa-chess-king"
             case _:
                 return ""
