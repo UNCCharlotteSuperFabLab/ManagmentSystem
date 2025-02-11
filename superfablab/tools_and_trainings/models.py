@@ -33,6 +33,7 @@ class Training(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="trainings")
     category = models.ForeignKey(TrainingCategory, on_delete=models.PROTECT, related_name="trainings")
     training_level = models.IntegerField(choices=TrainingLevels.choices, default=TrainingLevels.RED_DOT)
+    certifier = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name="given_trainings")
     completed_on = models.DateTimeField(auto_now_add=True)
     objects = TrainingManager()
     
