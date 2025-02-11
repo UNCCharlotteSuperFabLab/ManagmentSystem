@@ -12,7 +12,6 @@ class TrainingCategory(models.Model):
     
     @property
     def name_readable(self):
-        print(self.name.replace("_", " "))
         return self.name.replace("_", " ")
     
     def __str__(self):

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+
+
+{% block title %}SFL - Create Training{% endblock %}
+
+{% block content %}
+
+<div id="loading-indicator" class="modal">
+    <style>
+      .loader-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .loader {
+        border: 6px solid rgba(0, 0, 0, 0.1);
+        border-top-color: #00d1b2; /* Bulma primary color */
+        border-radius: 50%;
+        width: 80px; /* Adjust size */
+        height: 80px; /* Adjust size */
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      </style>    
+    <div class="modal-background"></div>
+    <div class="modal-content has-text-centered">
+      <div class="loader-wrapper">
+        <div class="loader"></div>
+        <p class="has-text-white mt-4">Fetching User Data...</p>
+      </div>
+    </div>
+  </div>
+
+
+<section class="section">
+    <div class="container">
+      <div class="columns is-vcentered is-centered">
+        <div class="column is-half">
+          <div class="box">
+            <h2 class="title is-4 has-text-centered">Add Training to a User</h2>
+            <form method="post">
+              {% csrf_token %}
+  
+              <div class="field">
+                <label for="id_user" class="label">User</label>
+                <div class="control select">
+                  <select name="user">
+                    <option disabled selected value> -- select a User -- </option>
+                    {% for visit in current_visits %}
+                        <option value={{ visit.niner_id }}>{{ visit }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>  
+  
+  
+              <div class="field">
+                <label for="id_last_name" class="label">Training Category</label>
+                <div class="control select">
+                    <select name="category">
+                    <option disabled selected value> -- select a training -- </option>
+                      {% for training_category in available_trainings %}
+                          <option value={{ training_category.id }}>{{ training_category.name_readable }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+              </div>
+  
+  
+              <div class="field">
+                
+                  <label for="id_email" class="label">Training Level</label>
+                  <div class="control select">
+                    <select name="level">
+                        <option disabled selected value> -- select the level -- </option>
+
+                      {% for level in training_levels %}
+                          <option value={{ level.0 }}>{{ level.1 }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+  
+              
+  
+              <div class="field">
+                <div class="control">
+                  <button type="submit" class="button is-primary is-fullwidth">Add Training</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+{% endblock %}
