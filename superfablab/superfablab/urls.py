@@ -30,7 +30,8 @@ urlpatterns = [
     path("station/", include("visit_tracking.urls")),
     path('', views.index, name='home'),
     path('me/profile', views.profile, name='profile'),
-    path('staff/user_list', views.users_in_space, name = 'user_list')
+    path('staff/user_list', views.users_in_space, name = 'user_list'),
+    path('training/', include("tools_and_trainings.urls"))
     
 ]
 
