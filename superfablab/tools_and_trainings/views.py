@@ -19,7 +19,8 @@ def create_training(request):
         print(f"POST {request.POST}")
         user = SpaceUser.objects.get(niner_id=request.POST['user'])
         category = TrainingCategory.objects.get(id=request.POST['category'])
-        training = Training.objects.create(user=user, category=category, training_level=request.POST['level'])
+        certifier = request.user
+        training = Training.objects.create(user=user, category=category, training_level=request.POST['level'], certifier=certifier)
 
         return redirect("home")
     
