@@ -63,28 +63,28 @@
   
   
               <div class="field">
-                <label for="id_last_name" class="label">Training Category</label>
+                <label for="id_category" class="label">Training Category</label>
                 <div class="control select">
-                    <select name="category">
+                    <select name="category", id="category">
                     <option disabled selected value> -- select a training -- </option>
-                      {% for training_category in available_trainings %}
+                    {% for training_category, available_trainings in available_trainings.items %}
                           <option value={{ training_category.id }}>{{ training_category.name_readable }}</option>
-                      {% endfor %}
+                    {% endfor %}
                     </select>
                   </div>
               </div>
   
   
               <div class="field">
-                
-                  <label for="id_email" class="label">Training Level</label>
+                  <label for="id_level" class="label">Training Level</label>
                   <div class="control select">
-                    <select name="level">
+                    <select name="level" id="level">
                         <option disabled selected value> -- select the level -- </option>
-
-                      {% for level in training_levels %}
-                          <option value={{ level.0 }}>{{ level.1 }}</option>
-                      {% endfor %}
+                        {% for training_category, available_trainings in available_trainings.items %}
+                            {% for level in available_trainings %}
+                            <option parent={{ training_category.id }} value={{ level.0 }}>{{ level.1 }}</option>
+                            {% endfor %}
+                        {% endfor %}
                     </select>
                   </div>
                 </div>
@@ -102,5 +102,25 @@
       </div>
     </div>
   </section>
-  
+
+  <script>
+    var document = window.document;
+    $(document).ready(function(){
+
+        var $field1var=$("#category");
+        var $field2var=$("#level");
+
+        var $field2options=$field2var.find('option');
+
+        $field2var.html($field2options.filter('[value=""]'));
+
+        $field1var.on('change',function(){
+            $field2var.html($field2options.filter('[parent="'+this.value+'"],[value=""]'));
+            $('#field2 option[value=""]').prop('selected', true);
+
+        });
+    });
+</script> 
+
+
 {% endblock %}
