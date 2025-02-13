@@ -20,7 +20,9 @@ def open_required(view_func):
 
 def index(request):
     context ={
-        'user_can_open_space': not request.user.is_anonymous and request.user.space_level >= get_user_model().SpaceLevel.VOLUNTEER
+        'user_can_open_space': not request.user.is_anonymous and request.user.space_level >= get_user_model().SpaceLevel.VOLUNTEER,
+        'user_can_train': not request.user.is_anonymous and Training.objects.filter(user=request.user, training_level__gte=Training.TrainingLevels.TRAINER).exists(),
+
     }
     return render(request, 'index.html', context)
 
