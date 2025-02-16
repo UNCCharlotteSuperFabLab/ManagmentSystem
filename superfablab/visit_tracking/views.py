@@ -96,9 +96,9 @@ def leaderboard_of_shame():
             entry["user"] = SpaceUser.objects.get(niner_id=entry["user"])
             entry["times_forgot_to_signout"] /= visits
         else:
-            entry = {}
+            entry["user"] = None
 
-    forgotten_signouts.order_by("-times_forgot_to_signout")
+    forgotten_signouts.order_by("-times_forgot_to_signout").filter(user__ne=None)
         
 
     

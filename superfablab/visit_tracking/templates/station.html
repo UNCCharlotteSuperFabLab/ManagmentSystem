@@ -271,14 +271,14 @@
             }
             
           </style>
-          <div class="has-text-centered">
+          {% comment %} <div class="has-text-centered">
             <p> Leaderboard of <strong>SHAME<strong> </p>
               <ol>
                 {% for item in leaderboard_of_shame %}
                   <li> {{ item.user.get_short_name }} - {{ item.times_forgot_to_signout | floatformat:2  }}</li>
                 {% endfor%}
               </ol>
-            </div>
+            </div> {% endcomment %}
         </div>
       </div>
     </div>
