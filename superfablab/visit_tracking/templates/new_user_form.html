@@ -10,32 +10,32 @@
 <section class="section">
   <div class="container">
     <div class="columns is-vcentered is-centered">
-      <div class="column is-half">
+      <div class="column is-three-quarters">
         <div class="box">
           <h2 class="title is-4 has-text-centered">First Time Guest</h2>
           <form method="post">
             {% csrf_token %}
 
             <div class="field">
-              <label for="id_first_name" class="label">First Name</label>
+              <label for="id_first_name" class="label is-text is-size-3">First Name</label>
               <div class="control">
-                <input type="text" name="first_name" class="input"  required id="id_first_name" {% if first_name %} value="{{first_name}} {% endif %}" autofocus>
+                <input type="text" name="first_name" class="input is-text is-size-1"  required id="id_first_name" {% if first_name %} value="{{first_name}} {% endif %}" autofocus placeholder="Jane">
               </div>
             </div>  
 
 
             <div class="field">
-              <label for="id_last_name" class="label">Last Name</label>
+              <label for="id_last_name" class="label is-text is-size-3">Last Name</label>
               <div class="control">
-                <input type="text" name="last_name" class="input" required id="id_last_name" {% if last_name %} value="{{last_name}}" {% endif %}>
+                <input type="text" name="last_name" class="input is-text is-size-1" required id="id_last_name" {% if last_name %} value="{{last_name}}" {% endif %} placeholder-"">
               </div>
             </div>
 
 
             <div class="field">
-                <label for="id_email" class="label">@charlotte.edu email</label>
+                <label for="id_email" class="label is-text is-size-3">@charlotte.edu email</label>
                 <div class="control">
-                  <input type="email" name="email" class="input" required id="id_email" {% if email %} value="{{ email }}" {% endif %} >
+                  <input type="email" name="email" class="input is-text is-size-1" required id="id_email" {% if email %} value="{{ email }}" {% endif %} placeholder="jsmith@charlotte.edu" >
                 </div>
               </div>
 
