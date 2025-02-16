@@ -98,7 +98,7 @@ def leaderboard_of_shame():
         else:
             entry["user"] = None
 
-    forgotten_signouts.order_by("-times_forgot_to_signout").filter(user__ne=None)
+    forgotten_signouts.order_by("-times_forgot_to_signout")
         
 
     
