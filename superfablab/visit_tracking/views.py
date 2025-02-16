@@ -91,8 +91,17 @@ def leaderboard_of_shame():
     .order_by("-times_forgot_to_signout"))
     
     for entry in forgotten_signouts:
-        entry["user"] = SpaceUser.objects.get(niner_id=entry["user"])
-        entry["times_forgot_to_signout"] /= Visit.objects.filter(user=entry["user"]).count()
+        visits = Visit.objects.filter(user=entry["user"]).count()
+        if visits >= 2:
+            entry["user"] = SpaceUser.objects.get(niner_id=entry["user"])
+            entry["times_forgot_to_signout"] /= visits
+        else:
+            entry = {}
+
+    forgotten_signouts.order_by("-times_forgot_to_signout")
+        
+
+    
 
     return forgotten_signouts
 
