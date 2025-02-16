@@ -247,7 +247,7 @@
 
           <table class="table is-fullwidth">
             <tr>
-              <th># in Building</th>
+              <th># in </br>Building</th>
               <td>{{ number_present }}</td>
             </tr>
             <tr>
@@ -262,15 +262,23 @@
               <th>Hours (Week)</th>
               <td>{{weekly_hours|floatformat:1|default_if_none:"0.0"|add:""|floatformat:1}}</td>
             </tr>
-
-            <tr>
-              <th>Other Fun</th>
-              <td>Stats Here</td>
-            </tr>
-
-
             
           </table>
+          <style>
+            .has-text-centered ol {
+              display: inline-block;
+              text-align: left; /* Ensures text alignment inside the list remains natural */
+            }
+            
+          </style>
+          <div class="has-text-centered">
+            <p> Leaderboard of <strong>SHAME<strong> </p>
+              <ol>
+                {% for item in leaderboard_of_shame %}
+                  <li> {{ item.user.get_short_name }} - {{ item.times_forgot_to_signout | floatformat:2  }}</li>
+                {% endfor%}
+              </ol>
+            </div>
         </div>
       </div>
     </div>

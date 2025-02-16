@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.utils.timezone import now, localtime
 from django.db.models.functions import Coalesce
+from django.db.models import Count
+
 
 from typing import Tuple
 
@@ -82,6 +84,19 @@ def assign_keyholder(user, request):
     
     return redirect('station:scan')
 
+def leaderboard_of_shame():
+    forgotten_signouts = (Visit.objects.filter(forgot_to_signout=True)
+    .values("user")
+    .annotate(times_forgot_to_signout=Count("id"))
+    .order_by("-times_forgot_to_signout"))
+    
+    for entry in forgotten_signouts:
+        entry["user"] = SpaceUser.objects.get(niner_id=entry["user"])
+        entry["times_forgot_to_signout"] /= Visit.objects.filter(user=entry["user"]).count()
+
+    return forgotten_signouts
+
+
 
 
 def scan(request):
@@ -153,6 +168,7 @@ def scan(request):
         'first_keyholder_modal': first_keyholder_modal,
         'current_keyholder_modal': current_keyholder_modal,
         'weekly_hours':Visit.objects.get_hours_this_week(),
+        'leaderboard_of_shame':leaderboard_of_shame(),
         'user': user
     }
     return render(request, 'station.html', context)
