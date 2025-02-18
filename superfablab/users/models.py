@@ -7,6 +7,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.core.validators import FileExtensionValidator
 
 from django.utils.timezone import now, localtime, timedelta
+
 from visit_tracking.models import Visit
 
 
@@ -103,7 +104,7 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
         
     @property
     def last_visit(self):
-        return Visit.objects.filter(user__niner_id=self.niner_id).order_by("-enter_time").first().enter_time
+        return localtime(Visit.objects.filter(user__niner_id=self.niner_id).order_by("-enter_time").first().enter_time)
     
     def get_hours(self):    
         return self.last_week_hours, self.all_time_hours
