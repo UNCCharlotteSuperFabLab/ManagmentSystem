@@ -97,10 +97,8 @@ def leaderboard_of_shame():
             entry["times_forgot_to_signout"] /= visits
         else:
             entry["user"] = None
-
-    forgotten_signouts.order_by("-times_forgot_to_signout")
-        
-
+    forgotten_signouts = list(forgotten_signouts)
+    forgotten_signouts.sort(key=lambda x: x["times_forgot_to_signout"], reverse=True)
     
 
     return forgotten_signouts
