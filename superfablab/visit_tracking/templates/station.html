@@ -275,7 +275,7 @@
             <p> Leaderboard of <strong>SHAME<strong> </p>
               <ol>
                 {% for item in leaderboard_of_shame %}
-                  <li> {{ item.user.get_short_name }} - {{ item.times_forgot_to_signout | floatformat:2  }}</li>
+                  <li> {{ item.user.get_full_name }} - {{ item.times_forgot_to_signout | floatformat:2  }}</li>
                 {% endfor%}
               </ol>
             </div> 
