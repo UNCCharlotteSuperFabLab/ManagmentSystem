@@ -6,6 +6,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import SpaceUser, KeyholderHistory
 
 class SpaceUserAdmin(UserAdmin):
+    readonly_fields = ['last_week_hours','all_time_hours', 'all_time_visits', ]
     model = SpaceUser
     list_display = ['niner_id', 'first_name', 'last_name', 'email', 'space_level', 'user_picture']
     list_filter = ('is_staff', 'is_active', 'groups', 'space_level')
@@ -14,6 +15,7 @@ class SpaceUserAdmin(UserAdmin):
     
     fieldsets = (
         (None, {'fields': ('niner_id', 'password')}),
+        ('Space Usage', {'fields': ('last_week_hours', 'all_time_hours', 'all_time_visits')}),
         ('Space Access', {'fields': ('space_level', 'keyholder_priority')}),
         ('Personal Info', {'fields': ('first_name', 'last_name', 'email', 'canvas_id', 'user_picture')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),

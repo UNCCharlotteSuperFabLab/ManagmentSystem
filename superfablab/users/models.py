@@ -6,7 +6,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.validators import FileExtensionValidator
 
-from django.utils.timezone import now, localtime
+from django.utils.timezone import now, localtime, timedelta
+from visit_tracking.models import Visit
+
 
 
 from typing import Dict, Tuple
@@ -83,6 +85,27 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
     
     def get_short_name(self) -> str:
         return f"{self.first_name}"
+    
+    @property
+    def last_week_hours(self):
+        one_week_ago = now() - timedelta(weeks=1)
+        last_week_visits = Visit.objects.filter(user__niner_id=self.niner_id, enter_time__gte=one_week_ago, still_in_the_space=False).exclude(forgot_to_signout=True)
+        return sum((visit.exit_time - visit.enter_time).total_seconds() for visit in last_week_visits) / 3600
+
+    @property
+    def all_time_hours(self):
+        all_time_visits = Visit.objects.filter(user__niner_id=self.niner_id, still_in_the_space=False).exclude(forgot_to_signout=True)
+        return sum((visit.exit_time - visit.enter_time).total_seconds() for visit in all_time_visits) / 3600
+    
+    @property
+    def all_time_visits(self):
+        return Visit.objects.filter(user__niner_id=self.niner_id, still_in_the_space=False).exclude(forgot_to_signout=True).count()
+        
+
+    
+    def get_hours(self):    
+        return self.last_week_hours, self.all_time_hours
+
     
     def __str__(self):
         return self.get_full_name()
