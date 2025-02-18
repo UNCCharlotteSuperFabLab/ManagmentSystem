@@ -103,7 +103,7 @@ def leaderboard_of_shame():
     forgotten_signouts.sort(key=lambda x: x["times_forgot_to_signout"], reverse=True)
     
 
-    return forgotten_signouts
+    return forgotten_signouts[:5]
 
 
 
