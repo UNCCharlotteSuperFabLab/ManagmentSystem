@@ -8,9 +8,9 @@ from .models import SpaceUser, KeyholderHistory
 class SpaceUserAdmin(UserAdmin):
     readonly_fields = ['last_week_hours','all_time_hours', 'all_time_visits', 'last_visit', ]
     model = SpaceUser
-    list_display = ['niner_id', 'first_name', 'last_name', 'email', 'space_level', 'user_picture']
+    list_display = ['niner_id', 'first_name', 'last_name', 'email', 'space_level','all_time_visits','last_visit']
     list_filter = ('is_staff', 'is_active', 'groups', 'space_level')
-    search_fields = ['niner_id', 'email', 'first_name', 'last_name']
+    search_fields = ['niner_id', 'email', 'first_name', 'last_name', 'all_time_visits', 'last_visit']
     ordering = ['first_name']
     
     fieldsets = (
