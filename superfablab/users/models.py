@@ -101,7 +101,9 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
     def all_time_visits(self):
         return Visit.objects.filter(user__niner_id=self.niner_id, still_in_the_space=False).exclude(forgot_to_signout=True).count()
         
-
+    @property
+    def last_visit(self):
+        return Visit.objects.filter(user__niner_id=self.niner_id).order_by("-enter_time").first().enter_time
     
     def get_hours(self):    
         return self.last_week_hours, self.all_time_hours
