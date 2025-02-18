@@ -28,20 +28,12 @@ def index(request):
 
 def profile(request):
     visits = Visit.objects.filter(user__niner_id=request.user.niner_id).order_by('-enter_time')
-    
-    one_week_ago = now() - timedelta(weeks=1)
-
-    last_week_visits = Visit.objects.filter(user__niner_id=request.user.niner_id, enter_time__gte=one_week_ago, still_in_the_space=False).exclude(forgot_to_signout=True)
-    all_time_visits = Visit.objects.filter(user__niner_id=request.user.niner_id, still_in_the_space=False).exclude(forgot_to_signout=True)
-    
-    last_week_hours = sum((visit.exit_time - visit.enter_time).total_seconds() for visit in last_week_visits) / 3600
-    total_hours = sum((visit.exit_time - visit.enter_time).total_seconds() for visit in all_time_visits) / 3600
-
+        
+    last_week_hours, total_hours = request.user.get_hours()
     
     context = {
         'all_time_visits':visits,
         'total_hours':total_hours,
-        'last_week_visits':last_week_visits,
         'last_week_hours':last_week_hours
     }
     
