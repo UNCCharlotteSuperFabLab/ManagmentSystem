@@ -10,7 +10,7 @@ class SpaceUserAdmin(UserAdmin):
     model = SpaceUser
     list_display = ['niner_id', 'first_name', 'last_name', 'email', 'space_level','all_time_visits','last_visit']
     list_filter = ('is_staff', 'is_active', 'groups', 'space_level')
-    search_fields = ['niner_id', 'email', 'first_name', 'last_name', 'all_time_visits', 'last_visit']
+    search_fields = ['niner_id', 'email', 'first_name', 'last_name']
     ordering = ['first_name']
     
     fieldsets = (
