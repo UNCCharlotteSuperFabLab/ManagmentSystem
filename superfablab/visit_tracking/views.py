@@ -94,7 +94,7 @@ def leaderboard_of_shame():
     
     for entry in forgotten_signouts:
         visits = Visit.objects.filter(user=entry["user"]).count()
-        if visits >= 2:
+        if visits >= 5:
             entry["user"] = SpaceUser.objects.get(niner_id=entry["user"])
             entry["times_forgot_to_signout"] /= visits
             filterd_forgotten.append(entry)
