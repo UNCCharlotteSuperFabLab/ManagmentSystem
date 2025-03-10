@@ -1,22 +1,35 @@
+from typing import Tuple
+from datetime import timedelta 
+import os
+
 from django.shortcuts import render, redirect
 from django.utils.timezone import now, localtime
 from django.db.models.functions import Coalesce
 from django.db.models import Count
 
-
-from typing import Tuple
-
-
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
+import brevo_python
+from brevo_python.rest import ApiException
 
 from .models import Visit
 from users.models import SpaceUser, KeyholderHistory
 from .forms import NewUserForm
+from .tasks import add
+from superfablab.celery import debug_task
 
-from datetime import timedelta 
+
+
+brevo_api_key = os.environ["BREVO_API_KEY"]
+configuration = brevo_python.Configuration()    
+configuration.api_key['api-key'] = brevo_api_key
+configuration.api_key['partner-key'] = brevo_api_key
+api_client = brevo_python.ApiClient(configuration)
+transactional_instance = brevo_python.TransactionalEmailsApi(api_client)
+
+
 
 def close_space(request):
     if request.method == 'POST' and 'barcode' in request.POST:
@@ -105,10 +118,22 @@ def leaderboard_of_shame():
 
     return forgotten_signouts[:5]
 
-
+def send_canvas_invite(email: str, name: str):
+    subject = "Thanks for Visiting the Super Fab Lab"
+    html_content = f"<html><body><h1> Thanks for visiting the SFL Today {name}! </h1> <p> We hope you had an amazing time! Please click <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a> to join our canvas page and do trainings </p</body></html>"
+    sender = {"name":"Super Fab Lab","email":"super-fab-lab@c4glenn.com"}
+    print(email, name)
+    to = [{"email":email,"name":name}]
+    send_smtp_email = brevo_python.SendSmtpEmail(to=to, html_content=html_content, sender=sender, subject=subject)
+    try:
+        api_response = transactional_instance.send_transac_email(send_smtp_email)
+    except ApiException as e:
+        print(f"Exception when calling AccountApi->send_email: {e}")
 
 
 def scan(request):
+    debug_task.delay()
+    add.delay(3, 4)
     first_keyholder_modal = False
     current_keyholder_modal = False
     dont_override = False
@@ -195,6 +220,7 @@ def new_user_form(request, niner_id):
         if form.is_valid():
             form.save()
             Visit.objects.scan(niner_id)
+            send_canvas_invite(user.email, user.get_short_name())
             return redirect('station:scan')  # Redirect back to the station view
     else:
         # Provide initial data for the form
