@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_beat',
+    'anymail',
 ]
 
 MIDDLEWARE = [
@@ -136,9 +138,9 @@ AUTH_USER_MODEL = 'users.SpaceUser'
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'America/New_York'
+CELERY_TIMEZONE = 'America/New_York'
 
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -173,3 +175,21 @@ RABBITMQ = {
 }
 
 CELERY_BROKER_URL = f"{RABBITMQ['PROTOCOL']}://{RABBITMQ['USER']}:{RABBITMQ['PASSWORD']}@{RABBITMQ['HOST']}:{RABBITMQ['PORT']}"
+
+from celery.schedules import crontab
+    
+# CELERY_BEAT_SCHEDULE = {
+#     'run-my-task-daily': {
+#         'task': 'users.tasks.check_for_needed_invites', # Replace your_app
+#         'schedule': crontab(hour=15, minute=41), # 5 PM EST
+#     },
+# }
+
+
+ANYMAIL = {
+    "BREVO_API_KEY": os.getenv("BREVO_API_KEY"),
+}
+
+EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"  # or sendgrid.EmailBackend, or...
+DEFAULT_FROM_EMAIL = "superfablab@c4glenn.com"  # if you don't already have this in settings
+SERVER_EMAIL = "superfablab@c4glenn.com"  # ditto (default from-email for Django errors)

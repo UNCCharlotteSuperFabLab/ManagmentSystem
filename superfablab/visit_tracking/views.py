@@ -11,25 +11,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-import brevo_python
-from brevo_python.rest import ApiException
-
 from .models import Visit
 from users.models import SpaceUser, KeyholderHistory
 from .forms import NewUserForm
 from .tasks import add
 from superfablab.celery import debug_task
-
-
-
-brevo_api_key = os.environ["BREVO_API_KEY"]
-configuration = brevo_python.Configuration()    
-configuration.api_key['api-key'] = brevo_api_key
-configuration.api_key['partner-key'] = brevo_api_key
-api_client = brevo_python.ApiClient(configuration)
-transactional_instance = brevo_python.TransactionalEmailsApi(api_client)
-
-
+from users.tasks import check_for_needed_invites
 
 def close_space(request):
     if request.method == 'POST' and 'barcode' in request.POST:
@@ -120,20 +107,14 @@ def leaderboard_of_shame():
 
 def send_canvas_invite(email: str, name: str):
     subject = "Thanks for Visiting the Super Fab Lab"
-    html_content = f"<html><body><h1> Thanks for visiting the SFL Today {name}! </h1> <p> We hope you had an amazing time! Please click <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a> to join our canvas page and do trainings </p</body></html>"
-    sender = {"name":"Super Fab Lab","email":"super-fab-lab@c4glenn.com"}
-    print(email, name)
+    html_content = f"<html><body><h1> Thanks for visiting the SFL {name}! </h1> <p> We hope you had an amazing time! Please click <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a> to join our canvas page and do trainings </p</body></html>"
     to = [{"email":email,"name":name}]
-    send_smtp_email = brevo_python.SendSmtpEmail(to=to, html_content=html_content, sender=sender, subject=subject)
-    try:
-        api_response = transactional_instance.send_transac_email(send_smtp_email)
-    except ApiException as e:
-        print(f"Exception when calling AccountApi->send_email: {e}")
-
+    # email.delay(to, subject, html_content)
 
 def scan(request):
-    debug_task.delay()
-    add.delay(3, 4)
+    # debug_task.delay()
+    # check_for_needed_invites.delay()
+    
     first_keyholder_modal = False
     current_keyholder_modal = False
     dont_override = False

@@ -46,7 +46,9 @@ services:
     restart: always
     build:
       context: .
-    command: celery -A superfablab worker -l info
+    command: celery -A superfablab worker -l info 
+    volumes:
+      - ./superfablab:/app
     env_file:
       - ./.env
     environment:
@@ -55,6 +57,20 @@ services:
       - web
       - rabbitmq
 
+  beat: 
+    restart: always
+    command: celery -A superfablab beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    build:
+      context: .
+    volumes:
+      - ./superfablab:/app
+    env_file:
+      - ./.env
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      - web
+      - rabbitmq
 
   node:
     image: node:18

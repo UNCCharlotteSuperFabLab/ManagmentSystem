@@ -1,16 +1,17 @@
 from django.db import models, transaction
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.utils.timezone import now, timedelta
+from users.tasks import canvas_update
+from users.models import SpaceUser
 
 class VisitManager(models.Manager):
     def get_signed_in_users(self):
-        return get_user_model().objects.filter(
+        return SpaceUser.objects.filter(
             visit__still_in_the_space=True
         ).distinct()
     
     def scan(self, niner_id:int):
-        user, created = get_user_model().objects.get_or_create(niner_id=niner_id)
+        user, created = SpaceUser.objects.get_or_create(niner_id=niner_id)
         with transaction.atomic():
             active_vist = self.filter(user=user, still_in_the_space=True).first()
             print(active_vist)
@@ -23,6 +24,8 @@ class VisitManager(models.Manager):
             else:
                 #sign in
                 self.create(user=user, enter_time=now(), still_in_the_space=True)
+                canvas_update.delay(user.niner_id)
+
             
         return user
     

@@ -49,6 +49,15 @@
                                             <input type="submit" class="button is-warning" value="Set Forgot"> 
                                         </form>                          
                                     {% endif %}
+                                    
+                                    {% if not user.user.canvas_id %}
+                                        <form method="POST", action="/users/{{user.user.niner_id}}/update_canvas_id" style="display:block;">
+                                            {% csrf_token %}
+                                            <input type="hidden" id="redirectId" name="redirect" value="{% url 'user_list' %}"/>
+                                            <input type="submit" class="button" value="Update Canvas Status"> 
+                                        </form>     
+                                    {% endif %}
+
                                     </div>
                                 </td>
                             </tr>
