@@ -191,5 +191,5 @@ ANYMAIL = {
 }
 
 EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"  # or sendgrid.EmailBackend, or...
-DEFAULT_FROM_EMAIL = "superfablab@c4glenn.com"  # if you don't already have this in settings
-SERVER_EMAIL = "superfablab@c4glenn.com"  # ditto (default from-email for Django errors)
+DEFAULT_FROM_EMAIL = "super-fab-lab@c4glenn.com"  # if you don't already have this in settings
+SERVER_EMAIL = "super-fab-lab@c4glenn.com"  # ditto (default from-email for Django errors)
