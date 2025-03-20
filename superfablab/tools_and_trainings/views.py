@@ -44,7 +44,7 @@ def create_training(request):
             try:
                 print(Training.objects.get(category=training, user=request.user))
             except Training.DoesNotExist as e:
-                print(f"user: {user} does not have any training {training}")
+                print(f"user: {request.user} does not have any training {training}")
         
     
     context = {
