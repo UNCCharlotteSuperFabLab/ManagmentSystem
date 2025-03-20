@@ -40,8 +40,11 @@ def create_training(request):
                     
                 if to.training_level == Training.TrainingLevels.CERTIFIER:
                     available_trainings[training].append(training_level)
-        except Exception as e:
-            print(Training.objects.get(category=training, user=request.user))
+        except Training.DoesNotExist as e:
+            try:
+                print(Training.objects.get(category=training, user=request.user))
+            except Training.DoesNotExist as e:
+                print(f"user: {user} does not have any training {training}")
         
     
     context = {
