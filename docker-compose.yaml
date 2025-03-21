@@ -31,14 +31,57 @@ services:
       - ./superfablab:/app
     depends_on:
       - db
+      - rabbitmq
     environment:
       - DATABASE_URL=postgres://postgres:${POSTGRESS_ROOT_PASSWORD}@db:5432/fablab
       - NINER_ENGAGE_COOKIE=${NINER_ENGAGE_COOKIE}
       - NINER_ENGAGE_TOKEN=${NINER_ENGAGE_TOKEN}
       - NINER_ENGAGE_PAYLOAD_TOKEN=${NINER_ENGAGE_PAYLOAD_TOKEN}
       - CANVAS_API_KEY=${CANVAS_API_KEY}
+      - BREVO_API_KEY=${BREVO_API_KEY}
+      - RABBITMQ_HOST=rabbitmq
     ports:
       - "80:8000"
+  celery:
+    restart: always
+    build:
+      context: .
+    command: celery -A superfablab worker -l info 
+    volumes:
+      - ./superfablab:/app
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - DATABASE_URL=postgres://postgres:${POSTGRESS_ROOT_PASSWORD}@db:5432/fablab
+      - NINER_ENGAGE_COOKIE=${NINER_ENGAGE_COOKIE}
+      - NINER_ENGAGE_TOKEN=${NINER_ENGAGE_TOKEN}
+      - NINER_ENGAGE_PAYLOAD_TOKEN=${NINER_ENGAGE_PAYLOAD_TOKEN}
+      - CANVAS_API_KEY=${CANVAS_API_KEY}
+      - BREVO_API_KEY=${BREVO_API_KEY}
+      - RABBITMQ_HOST=rabbitmq
+
+    depends_on:
+      - web
+      - rabbitmq
+
+  beat: 
+    restart: always
+    command: celery -A superfablab beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    build:
+      context: .
+    volumes:
+      - ./superfablab:/app
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - DATABASE_URL=postgres://postgres:${POSTGRESS_ROOT_PASSWORD}@db:5432/fablab
+      - NINER_ENGAGE_COOKIE=${NINER_ENGAGE_COOKIE}
+      - NINER_ENGAGE_TOKEN=${NINER_ENGAGE_TOKEN}
+      - NINER_ENGAGE_PAYLOAD_TOKEN=${NINER_ENGAGE_PAYLOAD_TOKEN}
+      - CANVAS_API_KEY=${CANVAS_API_KEY}
+      - BREVO_API_KEY=${BREVO_API_KEY}
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - web
+      - rabbitmq
 
   node:
     image: node:18
@@ -47,7 +90,13 @@ services:
       - ./superfablab:/app
     command: sh -c "npm install && npm run build-css"
 
+  rabbitmq:
+    image: rabbitmq:4.0-management
+    container_name: "rabbitmq"
+    ports:
+      - 5672:5672
+      - 15672:15672
 
- 
+
 volumes:
   pgdata:

@@ -1,22 +1,22 @@
+from typing import Tuple
+from datetime import timedelta 
+import os
+
 from django.shortcuts import render, redirect
 from django.utils.timezone import now, localtime
 from django.db.models.functions import Coalesce
 from django.db.models import Count
 
-
-from typing import Tuple
-
-
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-
 from .models import Visit
 from users.models import SpaceUser, KeyholderHistory
 from .forms import NewUserForm
-
-from datetime import timedelta 
+from .tasks import add
+from superfablab.celery import debug_task
+from users.tasks import check_for_needed_invites
 
 def close_space(request):
     if request.method == 'POST' and 'barcode' in request.POST:
@@ -105,10 +105,16 @@ def leaderboard_of_shame():
 
     return forgotten_signouts[:5]
 
-
-
+def send_canvas_invite(email: str, name: str):
+    subject = "Thanks for Visiting the Super Fab Lab"
+    html_content = f"<html><body><h1> Thanks for visiting the SFL {name}! </h1> <p> We hope you had an amazing time! Please click <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a> to join our canvas page and do trainings </p</body></html>"
+    to = [{"email":email,"name":name}]
+    # email.delay(to, subject, html_content)
 
 def scan(request):
+    # debug_task.delay()
+    # check_for_needed_invites.delay()
+    
     first_keyholder_modal = False
     current_keyholder_modal = False
     dont_override = False
@@ -195,6 +201,7 @@ def new_user_form(request, niner_id):
         if form.is_valid():
             form.save()
             Visit.objects.scan(niner_id)
+            send_canvas_invite(user.email, user.get_short_name())
             return redirect('station:scan')  # Redirect back to the station view
     else:
         # Provide initial data for the form

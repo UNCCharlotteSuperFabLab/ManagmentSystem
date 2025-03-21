@@ -5,10 +5,11 @@ import requests
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.validators import FileExtensionValidator
+from django.core.mail import send_mail
+
 
 from django.utils.timezone import now, localtime, timedelta
 
-from visit_tracking.models import Visit
 
 
 
@@ -18,7 +19,6 @@ from canvasapi import Canvas
 from canvasapi.user import User as CanvasUser
 
 import os
-
 
 class SpaceUserManager(BaseUserManager):
     def create_user(self, niner_id, password=None, **extra_fields) -> SpaceUser:
@@ -125,19 +125,31 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
         return f"space_user({self.niner_id}, {self.first_name}, {self.last_name}, {self.email}, {self.canvas_id})" + super().__repr__()
         
     def get_canvas_id_from_canvas(self) -> SpaceUser:
+        print("getting canvas id")
         if self.canvas_id:
+            return self
+        if not self.email:
+            return self
+        if not (self.email.endswith("@charlotte.edu") or self.email.endswith("@uncc.edu")):
             return self
         canvas = Canvas("https://instructure.charlotte.edu", os.getenv("CANVAS_API_KEY"))
         course = canvas.get_course(231237)
         for couse_user in course.get_users():
             couse_user: CanvasUser
             profile = couse_user.get_profile()
-            if profile["primary_email"] == self.email:
+            email_address = self.email[:self.email.find("@")]
+            if profile["primary_email"] == f"{email_address}@charlotte.edu":
                 self.canvas_id = profile["id"]
                 break
         
         if not self.canvas_id:
-            print("SEND CANVAS EMAIL HERE")
+            subject = "Join the Canvas Page for the Super Fab Lab"
+            html_content = f"<html><body><h1> Thanks for visiting the SFL {self.get_full_name()}! </h1> <p> We hope you had an amazing time! Please click <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a> to join our canvas page and do trainings </p</body></html>"
+            to = [{"email":self.email,"name":self.get_full_name()}]
+            # email.delay(to, subject, html_content)
+            send_mail(subject, "test", "super-fab-lab@c4glenn.com", [self.email], html_message=html_content)
+
+            print("sending email")
             return self#Send email invite?
         else:
             self.save()
@@ -161,3 +173,6 @@ class KeyholderHistory(models.Model):
     start_time = models.DateTimeField()
     exit_time = models.DateTimeField(null=True, blank=True)
     objects = KeyolderHistoryManager()
+    
+    
+from visit_tracking.models import Visit

@@ -27,3 +27,5 @@ urllib3==2.2.3
 vine==5.1.0
 wcwidth==0.2.13
 pillow>=10.0.0
+django-celery-beat==2.7.0
+django-anymail==12.0
