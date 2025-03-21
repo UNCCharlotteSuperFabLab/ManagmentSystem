@@ -49,10 +49,16 @@ services:
     command: celery -A superfablab worker -l info 
     volumes:
       - ./superfablab:/app
-    env_file:
-      - ./.env
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - DATABASE_URL=postgres://postgres:${POSTGRESS_ROOT_PASSWORD}@db:5432/fablab
+      - NINER_ENGAGE_COOKIE=${NINER_ENGAGE_COOKIE}
+      - NINER_ENGAGE_TOKEN=${NINER_ENGAGE_TOKEN}
+      - NINER_ENGAGE_PAYLOAD_TOKEN=${NINER_ENGAGE_PAYLOAD_TOKEN}
+      - CANVAS_API_KEY=${CANVAS_API_KEY}
+      - BREVO_API_KEY=${BREVO_API_KEY}
+      - RABBITMQ_HOST=rabbitmq
+
     depends_on:
       - web
       - rabbitmq
@@ -64,10 +70,15 @@ services:
       context: .
     volumes:
       - ./superfablab:/app
-    env_file:
-      - ./.env
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - DATABASE_URL=postgres://postgres:${POSTGRESS_ROOT_PASSWORD}@db:5432/fablab
+      - NINER_ENGAGE_COOKIE=${NINER_ENGAGE_COOKIE}
+      - NINER_ENGAGE_TOKEN=${NINER_ENGAGE_TOKEN}
+      - NINER_ENGAGE_PAYLOAD_TOKEN=${NINER_ENGAGE_PAYLOAD_TOKEN}
+      - CANVAS_API_KEY=${CANVAS_API_KEY}
+      - BREVO_API_KEY=${BREVO_API_KEY}
+      - RABBITMQ_HOST=rabbitmq
     depends_on:
       - web
       - rabbitmq
