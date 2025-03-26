@@ -4,7 +4,9 @@ from django.http import HttpResponse
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from django.utils.timezone import now, timedelta
+from django.utils.timezone import now, timedelta, localtime
+from django.db.models.functions import TruncDate
+from django.db.models import Count
 
 
 from users.models import KeyholderHistory
@@ -43,8 +45,21 @@ def coming_soon(request):
     return render(request, 'coming_soon.html')
 
 def stats(request):
+    visits_by_day = (
+        Visit.objects
+        .annotate(day=TruncDate("enter_time"))
+        .values("day")
+        .annotate(unique_visitors=Count("user", distinct=True)) 
+        .order_by("-unique_visitors")
+    )
+    
+    if visits_by_day.exists():
+        busiest = visits_by_day.first()
+    else:
+        busiest = None
+    
     context = {
-        'highest_unique': 'Friday, March 3rd 2025'
+        'highest_unique': busiest
     }
     return render(request, 'stats.html', context)
 
