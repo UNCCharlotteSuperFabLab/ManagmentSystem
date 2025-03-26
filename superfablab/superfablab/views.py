@@ -71,10 +71,19 @@ def users_per_day_chart(request):
         .annotate(unique_visitors=Count("user", distinct=True))  # Count unique users per day
         .order_by("day")  # Sort by date
     )
+    
+    recorded_data = {entry["day"]: entry["unique_visitors"] for entry in visits_by_day}
+    
+    start_date = min(recorded_data.keys())
+    end_date = now().date()
+    full_date_range = [start_date + timedelta(days=i) for i in range((end_date - start_date).days + 1)]
+    
+    complete_data = {date: recorded_data.get(date, 0) for date in full_date_range}
 
     data = {
-        "labels": [entry["day"].strftime("%Y-%m-%d") for entry in visits_by_day],  # Format dates as strings
-        "values": [entry["unique_visitors"] for entry in visits_by_day],  # User counts
+        "labels": [date.strftime("%Y-%m-%d") for date in complete_data.keys()],
+        "values": list(complete_data.values())
+
     }
 
     return JsonResponse(data)
