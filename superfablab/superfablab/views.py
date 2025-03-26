@@ -118,7 +118,6 @@ def users_per_day_chart(request):
 def users_in_space(request):
     current_keyholder = KeyholderHistory.objects.get_current_keyholder()
 
-    users_from_last_login = get_user_model().objects.filter(last_login__date=timezone.now().date())
     users_from_activity_logs = get_user_model().objects.filter(visit__still_in_the_space=True).distinct()
 
     active_users = []
@@ -126,10 +125,6 @@ def users_in_space(request):
     for user in users_from_activity_logs:
         active_users.append({"user": user, "method": "in_person", "trainings": Training.objects.get_users_trainings(user)})        
 
-
-    for user in users_from_last_login:
-        if not any(u["user"] == user for u in active_users):
-            active_users.append({"user": user, "method": "online"})
     context = {
         "active_users": active_users, 
         "keyholder": current_keyholder,
