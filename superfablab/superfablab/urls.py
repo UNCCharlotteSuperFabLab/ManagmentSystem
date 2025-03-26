@@ -32,7 +32,8 @@ urlpatterns = [
     path('me/profile', views.profile, name='profile'),
     path('staff/user_list', views.users_in_space, name = 'user_list'),
     path('training/', include("tools_and_trainings.urls")),
-    path('stats', views.stats, name='stats')
+    path('stats', views.stats, name='stats'),
+    path('users-per-day-chart/', views.users_per_day_chart, name="chart")
     
 ]
 

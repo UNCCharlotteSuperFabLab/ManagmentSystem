@@ -13,5 +13,32 @@
 </div>
 </section>
 
+<canvas id="userChart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+fetch('/users-per-day-chart/')
+  .then(response => response.json())
+  .then(data => {
+    const ctx = document.getElementById('userChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.labels,  // X-axis: Dates
+        datasets: [{
+          label: 'Unique Users Per Day',
+          data: data.values,  // Y-axis: User count
+          borderColor: 'blue',
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  });
+</script>
+
 
 {% endblock content%}

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import permission_required, user_passes_test
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.contrib.auth import get_user_model
@@ -62,6 +62,23 @@ def stats(request):
         'highest_unique': busiest
     }
     return render(request, 'stats.html', context)
+
+def users_per_day_chart(request):
+    visits_by_day = (
+        Visit.objects
+        .annotate(day=TruncDate("enter_time"))  # Extract the date
+        .values("day")
+        .annotate(unique_visitors=Count("user", distinct=True))  # Count unique users per day
+        .order_by("day")  # Sort by date
+    )
+
+    data = {
+        "labels": [entry["day"].strftime("%Y-%m-%d") for entry in visits_by_day],  # Format dates as strings
+        "values": [entry["unique_visitors"] for entry in visits_by_day],  # User counts
+    }
+
+    return JsonResponse(data)
+
 
 @open_required
 def users_in_space(request):
