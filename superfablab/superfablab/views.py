@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now, timedelta, localtime
 from django.db.models.functions import TruncDate
-from django.db.models import Count
+from django.db.models import Count, Avg, ExpressionWrapper, Q, F, DurationField
 
 
 from users.models import KeyholderHistory
@@ -66,26 +66,41 @@ def stats(request):
 def users_per_day_chart(request):
     visits_by_day = (
         Visit.objects
-        .annotate(day=TruncDate("enter_time"))  # Extract the date
+        .annotate(day=TruncDate("enter_time"))
         .values("day")
-        .annotate(unique_visitors=Count("user", distinct=True))  # Count unique users per day
-        .order_by("day")  # Sort by date
+        .annotate(
+            unique_visitors=Count("user", distinct=True),
+            avg_visit_length=Avg(
+                ExpressionWrapper(
+                    F("exit_time") - F("enter_time"),
+                    output_field=DurationField()
+                ),
+                filter=Q(forgot_to_signout=False) | Q(forgot_to_signout__isnull=True)
+            )
+        )
+        .order_by("day")
     )
     
-    recorded_data = {entry["day"]: entry["unique_visitors"] for entry in visits_by_day}
+    recorded_data = {entry["day"]: {"users": entry["unique_visitors"], "avg_length": entry["avg_visit_length"]} for entry in visits_by_day}
     
     start_date = min(recorded_data.keys())
     end_date = now().date()
     full_date_range = [start_date + timedelta(days=i) for i in range((end_date - start_date).days + 1)]
     
-    complete_data = {date: recorded_data.get(date, 0) for date in full_date_range}
+    complete_data = {
+        date: {
+            "users": recorded_data.get(date, {}).get("users", 0),
+            "avg_length": recorded_data.get(date, {}).get("avg_length", None)
+        }
+        for date in full_date_range
+    }
 
     data = {
         "labels": [date.strftime("%a %Y-%m-%d") for date in complete_data.keys()],
-        "values": list(complete_data.values())
-
+        "values": [entry["users"] for entry in complete_data.values()],
+        "avg_lengths": [(entry["avg_length"].total_seconds() / 3600) if entry["avg_length"] else 0 for entry in complete_data.values()]
     }
-
+    
     return JsonResponse(data)
 
 

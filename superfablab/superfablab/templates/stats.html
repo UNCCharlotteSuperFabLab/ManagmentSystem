@@ -17,28 +17,50 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-fetch('/users-per-day-chart/')
-  .then(response => response.json())
-  .then(data => {
-    const ctx = document.getElementById('userChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: data.labels,  // X-axis: Dates
-        datasets: [{
-          label: 'Unique Users Per Day',
-          data: data.values,  // Y-axis: User count
-          borderColor: 'blue',
-          fill: false
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: { y: { beginAtZero: true } }
-      }
-    });
-  });
-</script>
-
+    fetch('/users-per-day-chart/')
+      .then(response => response.json())
+      .then(data => {
+        const ctx = document.getElementById('userChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: 'Unique Users Per Day',
+                data: data.values,
+                borderColor: 'blue',
+                yAxisID: 'y-users',
+                fill: false
+              },
+              {
+                label: 'Avg Visit Length (Hours)',
+                data: data.avg_lengths,
+                borderColor: 'green',
+                yAxisID: 'y-duration',
+                fill: false
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              'y-users': {
+                beginAtZero: true,
+                position: 'left',
+                title: { display: true, text: 'Unique Users' }
+              },
+              'y-duration': {
+                beginAtZero: true,
+                position: 'right',
+                title: { display: true, text: 'Avg Visit Length (minutes)' },
+                grid: { drawOnChartArea: false }  // Prevent grid lines from overlapping
+              }
+            }
+          }
+        });
+      });
+    </script>
+    
 
 {% endblock content%}
