@@ -42,6 +42,12 @@ def profile(request):
 def coming_soon(request):
     return render(request, 'coming_soon.html')
 
+def stats(request):
+    context = {
+        'highest_unique': 'Friday, March 3rd 2025'
+    }
+    return render(request, 'stats.html', context)
+
 @open_required
 def users_in_space(request):
     current_keyholder = KeyholderHistory.objects.get_current_keyholder()
