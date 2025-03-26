@@ -162,7 +162,7 @@ def scan(request):
         
         # return redirect('station:scan')
     
-    today_start = localtime(now())
+    today_start = localtime(now()).replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = today_start + timedelta(days=1)
 
     todays_transactions = Visit.objects.annotate(
