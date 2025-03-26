@@ -127,11 +127,13 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
     def get_canvas_id_from_canvas(self) -> SpaceUser:
         print("getting canvas id")
         if self.canvas_id:
+            print(f"Canvas id already known: {self.canvas_id}")
             return self
         if not self.email:
             return self
         if not (self.email.endswith("@charlotte.edu") or self.email.endswith("@uncc.edu")):
             return self
+        print(f"Passed Checks")
         canvas = Canvas("https://instructure.charlotte.edu", os.getenv("CANVAS_API_KEY"))
         course = canvas.get_course(231237)
         for couse_user in course.get_users():
@@ -140,6 +142,7 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
             email_address = self.email[:self.email.find("@")]
             if profile["primary_email"] == f"{email_address}@charlotte.edu":
                 self.canvas_id = profile["id"]
+                print(f"canvas: {self.canvas_id}")
                 break
         
         if not self.canvas_id:
