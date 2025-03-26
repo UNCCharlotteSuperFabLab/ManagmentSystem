@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now, timedelta, localtime
 from django.db.models.functions import TruncDate
-from django.db.models import Count, Avg, ExpressionWrapper, Q, F, DurationField
+from django.db.models import Count, Avg, ExpressionWrapper, Q, F, DurationField, Sum
 
 
 from users.models import KeyholderHistory
@@ -76,12 +76,20 @@ def users_per_day_chart(request):
                     output_field=DurationField()
                 ),
                 filter=Q(forgot_to_signout=False) | Q(forgot_to_signout__isnull=True)
+            ),
+            total_time=Sum(
+                ExpressionWrapper(
+                    F("exit_time") - F("enter_time"),
+                    output_field=DurationField()
+                ),
+                filter=Q(forgot_to_signout=False) | Q(forgot_to_signout__isnull=True)
+
             )
         )
         .order_by("day")
     )
     
-    recorded_data = {entry["day"]: {"users": entry["unique_visitors"], "avg_length": entry["avg_visit_length"]} for entry in visits_by_day}
+    recorded_data = {entry["day"]: {"users": entry["unique_visitors"], "avg_length": entry["avg_visit_length"], "total_time": entry["total_time"]} for entry in visits_by_day}
     
     start_date = min(recorded_data.keys())
     end_date = now().date()
@@ -90,7 +98,8 @@ def users_per_day_chart(request):
     complete_data = {
         date: {
             "users": recorded_data.get(date, {}).get("users", 0),
-            "avg_length": recorded_data.get(date, {}).get("avg_length", None)
+            "avg_length": recorded_data.get(date, {}).get("avg_length", None),
+            "total_time": recorded_data.get(date, {}).get("total_time", None),
         }
         for date in full_date_range
     }
@@ -98,7 +107,8 @@ def users_per_day_chart(request):
     data = {
         "labels": [date.strftime("%a %Y-%m-%d") for date in complete_data.keys()],
         "values": [entry["users"] for entry in complete_data.values()],
-        "avg_lengths": [(entry["avg_length"].total_seconds() / 3600) if entry["avg_length"] else 0 for entry in complete_data.values()]
+        "avg_lengths": [(entry["avg_length"].total_seconds() / 3600) if entry["avg_length"] else 0 for entry in complete_data.values()],
+        "total_time": [(entry["total_time"].total_seconds() / 3600) if entry["total_time"] else 0 for entry in complete_data.values()],
     }
     
     return JsonResponse(data)
