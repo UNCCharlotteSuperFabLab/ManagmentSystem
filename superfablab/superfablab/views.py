@@ -81,7 +81,7 @@ def users_per_day_chart(request):
     complete_data = {date: recorded_data.get(date, 0) for date in full_date_range}
 
     data = {
-        "labels": [date.strftime("%Y-%m-%d") for date in complete_data.keys()],
+        "labels": [date.strftime("%a %Y-%m-%d") for date in complete_data.keys()],
         "values": list(complete_data.values())
 
     }
