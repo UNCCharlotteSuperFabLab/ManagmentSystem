@@ -173,7 +173,7 @@ def scan(request):
     context = {
         'number_present': Visit.objects.filter(still_in_the_space=True).count(),
         'unique_visitors_today': Visit.objects.filter(enter_time__range=(today_start, today_end)).distinct('user').count(),
-        'keyholders_list':Visit.objects.filter(still_in_the_space=True, user__space_level__gte=SpaceUser.SpaceLevel.KEYHOLDER).distinct('user'),
+        'keyholders_list':Visit.objects.filter(still_in_the_space=True, user__space_level__gte=SpaceUser.SpaceLevel.VOLUNTEER).distinct('user'),
         'keyholder_name': keyholder_name,
         'keyholder_img_url': keyholder_img_url,
         'keyholder':current_keyholder,
