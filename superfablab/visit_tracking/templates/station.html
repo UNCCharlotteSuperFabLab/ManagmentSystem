@@ -119,7 +119,11 @@
             <ul>
               {% for keyholder_item in keyholders_list %}
                 {% if keyholder_item.user.niner_id != keyholder.keyholder.niner_id %}
-                  <li><strong>{{ keyholder_item.user }}</strong></li>
+                  {% if keyholder_item.user.space_level >= 70 %}
+                    <li><strong>{{ keyholder_item.user }}</strong></li>
+                  {% else %}
+                    <li>{{ keyholder_item.user }}</li>
+                  {% endif %}
                 {% endif %}
               {% endfor %}
             </ul>
