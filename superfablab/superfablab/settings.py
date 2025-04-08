@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'visit_tracking.apps.VisitTrackingConfig',
     'tools_and_trainings.apps.ToolsAndTrainingsConfig',
+    'association_tracking.apps.AssociationTrackingConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

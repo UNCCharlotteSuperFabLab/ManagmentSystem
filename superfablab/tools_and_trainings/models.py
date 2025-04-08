@@ -20,9 +20,6 @@ class TrainingCategory(models.Model):
 class TrainingManager(models.Manager):
     def get_users_trainings(self, user: SpaceUser) -> List[Training]:
         trainings = list(self.filter(user=user).order_by("category", "-training_level").distinct("category").all())
-        print(f"Getting Trainings for {user}")
-        for t in trainings:
-            print(t)
         return trainings
 class Training(models.Model):
     class TrainingLevels(models.IntegerChoices):
