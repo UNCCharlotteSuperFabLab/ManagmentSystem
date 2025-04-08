@@ -90,7 +90,7 @@ def leaderboard_of_shame():
     forgotten_signouts = (Visit.objects.filter(forgot_to_signout=True)
     .values("user")
     .annotate(times_forgot_to_signout=Count("id"))
-    .order_by("-times_forgot_to_signout"))
+    .order_by("-times_forgot_to_signout"))[:5]
     
     filterd_forgotten = []
     
