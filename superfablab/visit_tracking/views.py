@@ -5,7 +5,8 @@ import os
 from django.shortcuts import render, redirect
 from django.utils.timezone import now, localtime
 from django.db.models.functions import Coalesce
-from django.db.models import Count
+from django.db.models import Count, F, ExpressionWrapper, FloatField, Q
+
 from django.core.cache import cache
 
 
@@ -87,25 +88,25 @@ def assign_keyholder(user, request):
     return redirect('station:scan')
 
 def leaderboard_of_shame():
-    forgotten_signouts = (Visit.objects.filter(forgot_to_signout=True)
-    .values("user")
-    .annotate(times_forgot_to_signout=Count("id"))
-    .order_by("-times_forgot_to_signout"))[:5]
-    
-    filterd_forgotten = []
-    
-    for entry in forgotten_signouts:
-        visits = Visit.objects.filter(user=entry["user"]).count()
-        if visits >= 5:
-            entry["user"] = SpaceUser.objects.get(niner_id=entry["user"])
-            entry["times_forgot_to_signout"] /= visits
-            filterd_forgotten.append(entry)
-            
-    forgotten_signouts = list(filterd_forgotten)
-    forgotten_signouts.sort(key=lambda x: x["times_forgot_to_signout"], reverse=True)
-    
+    forgotten_signouts = (
+        Visit.objects
+        .values("user__niner_id", "user__first_name", "user__last_name")  # Add any fields you want
+        .annotate(
+            times_forgot_to_signout=Count("id", filter=Q(forgot_to_signout=True)),
+            total_visits=Count("id"),
+        )
+        .filter(total_visits__gte=5)
+        .annotate(
+            forget_ratio=ExpressionWrapper(
+                F("times_forgot_to_signout") * 1.0 / F("total_visits"),
+                output_field=FloatField()
+            )
+        )
+        .order_by("-forget_ratio")[:5]
+    )
 
-    return forgotten_signouts[:5]
+    return forgotten_signouts
+
 
 
 def send_canvas_invite(email: str, name: str):
