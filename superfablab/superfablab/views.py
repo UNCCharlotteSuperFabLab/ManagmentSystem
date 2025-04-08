@@ -70,6 +70,7 @@ def users_per_day_chart(request):
         .values("day")
         .annotate(
             unique_visitors=Count("user", distinct=True),
+            visit_count=Count("id"),
             avg_visit_length=Avg(
                 ExpressionWrapper(
                     F("exit_time") - F("enter_time"),
@@ -89,7 +90,14 @@ def users_per_day_chart(request):
         .order_by("day")
     )
     
-    recorded_data = {entry["day"]: {"users": entry["unique_visitors"], "avg_length": entry["avg_visit_length"], "total_time": entry["total_time"]} for entry in visits_by_day}
+    recorded_data = {
+        entry["day"]: {"users": entry["unique_visitors"],
+                        "visits": entry["visit_count"],
+                        "avg_length": entry["avg_visit_length"],
+                        "total_time": entry["total_time"],
+                        "avg_visits_per_user": (entry["visit_count"] / entry["unique_visitors"]) if entry["unique_visitors"] else 0
+
+        } for entry in visits_by_day}
     
     start_date = min(recorded_data.keys())
     end_date = now().date()
@@ -100,6 +108,8 @@ def users_per_day_chart(request):
             "users": recorded_data.get(date, {}).get("users", 0),
             "avg_length": recorded_data.get(date, {}).get("avg_length", None),
             "total_time": recorded_data.get(date, {}).get("total_time", None),
+            "avg_visits_per_user": recorded_data.get(date, {}).get("avg_visits_per_user", 0)
+
         }
         for date in full_date_range
     }
@@ -109,6 +119,8 @@ def users_per_day_chart(request):
         "values": [entry["users"] for entry in complete_data.values()],
         "avg_lengths": [(entry["avg_length"].total_seconds() / 3600) if entry["avg_length"] else 0 for entry in complete_data.values()],
         "total_time": [(entry["total_time"].total_seconds() / 3600) if entry["total_time"] else 0 for entry in complete_data.values()],
+        "avg_visits_per_user": [entry["avg_visits_per_user"] for entry in complete_data.values()],
+
     }
     
     return JsonResponse(data)

@@ -46,6 +46,13 @@
                 borderColor: 'red',
                 yAxisID: 'y-duration',
                 fill: false
+              },
+              {
+                label: 'Avg Visits per User',
+                data: data.avg_visits_per_user,
+                borderColor: 'orange',
+                yAxisID: 'y-visits',
+                fill:false
               }
             ]
           },
@@ -60,7 +67,13 @@
               'y-duration': {
                 beginAtZero: true,
                 position: 'right',
-                title: { display: true, text: 'Avg Visit Length (minutes)' },
+                title: { display: true, text: 'Visit Length (Hours)' },
+                grid: { drawOnChartArea: false }  // Prevent grid lines from overlapping
+              },
+              'y-visits': {
+                beginAtZero: true,
+                position: 'left',
+                title: { display: true, text: 'Visits' },
                 grid: { drawOnChartArea: false }  // Prevent grid lines from overlapping
               }
             }
