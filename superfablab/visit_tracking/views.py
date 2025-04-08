@@ -6,6 +6,8 @@ from django.shortcuts import render, redirect
 from django.utils.timezone import now, localtime
 from django.db.models.functions import Coalesce
 from django.db.models import Count
+from django.core.cache import cache
+
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -104,6 +106,7 @@ def leaderboard_of_shame():
     
 
     return forgotten_signouts[:5]
+
 
 def send_canvas_invite(email: str, name: str):
     subject = "Thanks for Visiting the Super Fab Lab"

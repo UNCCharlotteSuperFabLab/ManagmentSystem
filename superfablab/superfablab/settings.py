@@ -48,9 +48,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_celery_beat',
     'anymail',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -193,3 +195,11 @@ ANYMAIL = {
 EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"  # or sendgrid.EmailBackend, or...
 DEFAULT_FROM_EMAIL = "super-fab-lab@c4glenn.com"  # if you don't already have this in settings
 SERVER_EMAIL = "super-fab-lab@c4glenn.com"  # ditto (default from-email for Django errors)
+
+
+INTERNAL_IPS = ['127.0.0.1', '172.18.0.1']
+
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+}

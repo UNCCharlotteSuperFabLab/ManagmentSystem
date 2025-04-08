@@ -21,6 +21,7 @@ from . import views
 
 from django.conf import settings
 from django.conf.urls.static import static
+import debug_toolbar
 
 
 urlpatterns = [
@@ -33,7 +34,8 @@ urlpatterns = [
     path('staff/user_list', views.users_in_space, name = 'user_list'),
     path('training/', include("tools_and_trainings.urls")),
     path('stats', views.stats, name='stats'),
-    path('users-per-day-chart/', views.users_per_day_chart, name="chart")
+    path('users-per-day-chart/', views.users_per_day_chart, name="chart"),
+    path('__debug__/', include(debug_toolbar.urls)),
     
 ]
 
