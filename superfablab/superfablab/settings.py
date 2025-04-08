@@ -197,4 +197,4 @@ DEFAULT_FROM_EMAIL = "super-fab-lab@c4glenn.com"  # if you don't already have th
 SERVER_EMAIL = "super-fab-lab@c4glenn.com"  # ditto (default from-email for Django errors)
 
 
-INTERNAL_IPS = ['127.0.0.1', '172.18.0.1']
+INTERNAL_IPS = ['127.0.0.1']
