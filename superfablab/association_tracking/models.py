@@ -32,7 +32,19 @@ class AssociationManager(models.Manager):
             association.user = user
             association.save()
     def create_associaton(self, entity: AssociationEntities, niner_id=None, email=None):
-        pass
+        if not niner_id and not email:
+            raise ValueError("need either niner_id or email")
+        if niner_id:
+            user = SpaceUser.objects.get_or_create(niner_id=niner_id)
+            us_email = user.email
+        else:
+            try:
+                user = SpaceUser.objects.get(email=email)
+            except SpaceUser.DoesNotExist:
+                user = None
+            us_email = email
+        
+        self.create(user=user, email=us_email, entity=entity)
 
 class Association(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user", blank=True, null=True)
