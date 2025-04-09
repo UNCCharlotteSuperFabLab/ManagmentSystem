@@ -186,6 +186,20 @@
                 <div class="field">
                   <div id="member-id-control" class="control">
                     {% comment %} <input id="redirectID" type="hidden", name="redirect", value="{% url 'station:scan' %}"> {% endcomment %}
+                    
+                    <style>
+                      input::-webkit-outer-spin-button,
+                      input::-webkit-inner-spin-button {
+                        -webkit-appearance: none;
+                        margin: 0;
+                      }
+
+                      /* Firefox */
+                      input[type=number] {
+                        -moz-appearance: textfield;
+                      }
+                    </style>
+
                     <input 
                       id="member_id" 
                       class="input" 
