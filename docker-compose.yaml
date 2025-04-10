@@ -97,6 +97,15 @@ services:
       - 5672:5672
       - 15672:15672
 
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=$CLOUDFLARE_TOKEN  
+
+
 
 volumes:
   pgdata:
