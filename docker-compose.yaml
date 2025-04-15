@@ -104,6 +104,8 @@ services:
     command: tunnel --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=$CLOUDFLARE_TOKEN  
+    ports:
+      7844:7844
 
 
 
