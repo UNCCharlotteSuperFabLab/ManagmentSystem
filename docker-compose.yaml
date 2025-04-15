@@ -105,7 +105,7 @@ services:
     environment:
       - TUNNEL_TOKEN=$CLOUDFLARE_TOKEN  
     ports:
-      7844:7844
+      - 7844:7844
 
 
 
