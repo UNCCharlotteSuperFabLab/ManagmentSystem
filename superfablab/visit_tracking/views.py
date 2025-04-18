@@ -111,7 +111,7 @@ def leaderboard_of_shame():
 
 def send_canvas_invite(email: str, name: str):
     subject = "Thanks for Visiting the Super Fab Lab"
-    html_content = f"<html><body><h1> Thanks for visiting the SFL {name}! </h1> <p> We hope you had an amazing time! Please click <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a> to join our canvas page and do trainings </p</body></html>"
+    html_content = f"<html><body><h1> Thanks for visiting the SFL {name}! </h1> <p> We hope you had an amazing time! Please click <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a> to join our canvas page and do trainings. Please also join our Discord <a href='https://discord.gg/Y3xxAqQDq3'> </p</body></html>"
     to = [{"email":email,"name":name}]
     # email.delay(to, subject, html_content)
 
