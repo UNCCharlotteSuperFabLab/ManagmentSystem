@@ -8,7 +8,7 @@ from django.db.models.functions import Coalesce
 from django.db.models import Count, F, ExpressionWrapper, FloatField, Q
 
 from django.core.cache import cache
-
+from django.core.exceptions import ValidationError
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -128,6 +128,34 @@ def scan(request):
     user = None
     if request.method == 'POST' and 'barcode' in request.POST:
         barcode = request.POST['barcode']
+        
+        if len(barcode) > 9:
+            if len(barcode) % 9 != 0:
+                return render(request, "status/error.html", {'errror':'not an 800 number'}, status=406)
+            if current_keyholder is None:
+                return render(request, "status/error.html", {'error':'Need a keyholder to sign in first'}, status=400)
+
+            barcodes = [int(barcode[i:i+9] for i in range(0, len(barcode), 9))]
+            for barcode in barcodes:
+                user = Visit.objects.scan(barcode)
+                context = {
+                    'number_present': Visit.objects.filter(still_in_the_space=True).count(),
+                    'unique_visitors_today': Visit.objects.filter(enter_time__range=(today_start, today_end)).distinct('user').count(),
+                    'keyholders_list':Visit.objects.filter(still_in_the_space=True, user__space_level__gte=SpaceUser.SpaceLevel.VOLUNTEER).distinct('user'),
+                    'keyholder_name': keyholder_name,
+                    'keyholder_img_url': keyholder_img_url,
+                    'keyholder':current_keyholder,
+                    'currentkeyholderorvolunter': current_keyholder and current_keyholder.space_level >= SpaceUser.SpaceLevel.KEYHOLDER,
+                    'userkeyholderorvolunter': user and user.space_level >= SpaceUser.SpaceLevel.KEYHOLDER,
+                    'todays_transactions': todays_transactions,
+                    'first_keyholder_modal': first_keyholder_modal,
+                    'current_keyholder_modal': current_keyholder_modal,
+                    'weekly_hours':Visit.objects.get_hours_this_week(),
+                    'leaderboard_of_shame':leaderboard_of_shame(),
+                    'user': user
+                }
+                return render(request, 'station.html', context)
+
         redirect_val = request.POST.get('redirect', None)
         user, created = SpaceUser.objects.get_or_create(niner_id=barcode)
         if 'assign_keyholder' in request.POST:
