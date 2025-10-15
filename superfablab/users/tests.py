@@ -9,6 +9,6 @@ class SpaceUserModelTests(TestCase):
         super().__init__(methodName)
                 
     def test_get_canvas_id(self):
-        user = SpaceUser(niner_id=801276949, email="psmit145@charlotte.edu").get_canvas_id_from_canvas()
+        user = SpaceUser(niner_id=801380523, email="bwolfe14@charlotte.edu").get_canvas_id_from_canvas()
         self.assertIsNotNone(user.canvas_id)        
         
