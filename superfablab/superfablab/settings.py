@@ -188,7 +188,7 @@ CELERY_BEAT_SCHEDULE = {
 
     'update-certifications-every-hour': {
         'task': 'users.tasks.canvas_quiz_status',
-        'schedule': crontab(minute=0, hour='*'),  # every hour
+        'schedule': crontab(hour='*', minute=0),  # every hour
     }
  }
 
