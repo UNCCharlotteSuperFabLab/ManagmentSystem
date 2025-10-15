@@ -4,13 +4,14 @@ services:
     restart: always
     container_name: db
     environment:
-      POSTGRES_PASSWORD: ${POSTGRESS_ROOT_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASSWORD}
+      POSTGRES_DB: fablab
     volumes:
       - pgdata:/var/lib/postgresql/data 
     ports:
       - 5432:5432
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "fablab"]
+      test: ["CMD", "pg_isready  -d postgres -U fablab"]
       interval: 10s
       retries: 10
       start_period: 60s  # Give it more time to start
@@ -33,7 +34,7 @@ services:
       - db
       - rabbitmq
     environment:
-      - DATABASE_URL=postgres://postgres:${POSTGRESS_ROOT_PASSWORD}@db:5432/fablab
+      - DATABASE_URL=postgres://postgres:${POSTGRES_ROOT_PASSWORD}@db:5432/fablab
       - NINER_ENGAGE_COOKIE=${NINER_ENGAGE_COOKIE}
       - NINER_ENGAGE_TOKEN=${NINER_ENGAGE_TOKEN}
       - NINER_ENGAGE_PAYLOAD_TOKEN=${NINER_ENGAGE_PAYLOAD_TOKEN}
@@ -46,12 +47,12 @@ services:
     restart: always
     build:
       context: .
-    command: celery -A superfablab worker -l info 
+    entrypoint: celery -A superfablab worker -l info 
     volumes:
       - ./superfablab:/app
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-      - DATABASE_URL=postgres://postgres:${POSTGRESS_ROOT_PASSWORD}@db:5432/fablab
+      - DATABASE_URL=postgres://postgres:${POSTGRES_ROOT_PASSWORD}@db:5432/fablab
       - NINER_ENGAGE_COOKIE=${NINER_ENGAGE_COOKIE}
       - NINER_ENGAGE_TOKEN=${NINER_ENGAGE_TOKEN}
       - NINER_ENGAGE_PAYLOAD_TOKEN=${NINER_ENGAGE_PAYLOAD_TOKEN}
@@ -65,14 +66,14 @@ services:
 
   beat: 
     restart: always
-    command: celery -A superfablab beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    entrypoint: celery -A superfablab beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     build:
       context: .
     volumes:
       - ./superfablab:/app
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-      - DATABASE_URL=postgres://postgres:${POSTGRESS_ROOT_PASSWORD}@db:5432/fablab
+      - DATABASE_URL=postgres://postgres:${POSTGRES_ROOT_PASSWORD}@db:5432/fablab
       - NINER_ENGAGE_COOKIE=${NINER_ENGAGE_COOKIE}
       - NINER_ENGAGE_TOKEN=${NINER_ENGAGE_TOKEN}
       - NINER_ENGAGE_PAYLOAD_TOKEN=${NINER_ENGAGE_PAYLOAD_TOKEN}
@@ -82,6 +83,7 @@ services:
     depends_on:
       - web
       - rabbitmq
+      - db
 
   node:
     image: node:18

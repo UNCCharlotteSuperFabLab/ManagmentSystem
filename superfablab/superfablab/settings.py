@@ -107,7 +107,7 @@ else:
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'fablab',
             'USER': 'postgres',
-            'PASSWORD': os.getenv('POSTGRESS_ROOT_PASSWORD'),
+            'PASSWORD': 'guest',
             'HOST': 'db',  # or use the container name if it's in a Docker network
             'PORT': '5432',
         }
@@ -180,12 +180,17 @@ CELERY_BROKER_URL = f"{RABBITMQ['PROTOCOL']}://{RABBITMQ['USER']}:{RABBITMQ['PAS
 
 from celery.schedules import crontab
     
-# CELERY_BEAT_SCHEDULE = {
-#     'run-my-task-daily': {
-#         'task': 'users.tasks.check_for_needed_invites', # Replace your_app
-#         'schedule': crontab(hour=15, minute=41), # 5 PM EST
-#     },
-# }
+CELERY_BEAT_SCHEDULE = {
+   #'run-my-task-daily': {
+   #     'task': 'users.tasks.check_for_needed_invites', # Replace your_app
+   #    'schedule': crontab(hour=15, minute=41), # 5 PM EST
+   #},
+
+    'update-certifications-every-hour': {
+        'task': 'users.tasks.canvas_quiz_status',
+        'schedule': crontab(minute=0, hour='*'),  # every hour
+    }
+ }
 
 
 ANYMAIL = {

@@ -8,7 +8,7 @@ def index(request):
     return HttpResponse("Hello, world. You're at the users index.")
 
 def update_users_canvas_ID(request, user_id):
-    canvas_update.delay(user_id)
+    canvas_update(user_id)
     
     if request.POST and request.POST['redirect']:
         return redirect(request.POST['redirect'])

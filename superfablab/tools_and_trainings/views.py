@@ -25,10 +25,7 @@ def create_training(request):
         certifier = request.user
         training = Training.objects.create(user=user, category=category, training_level=request.POST['level'], certifier=certifier)
 
-        return redirect("home")
-    
-    available_trainings = {}
-    
+        return redirect("home")  
     for training in TrainingCategory.objects.all():
         try:
             to = Training.objects.get(category=training, user=request.user, training_level__gte=Training.TrainingLevels.TRAINER)
@@ -53,3 +50,8 @@ def create_training(request):
     }
     
     return render(request, "training_form.html", context)
+   
+#version of create_training that is only used in the code. cannot be called from post.
+# used to have system assign training to users automatically after they complete a training quiz.    
+def create_training_internal(user, category, level, certifier):    
+    Training.objects.create(user=user, category=category, training_level=level, certifier=certifier)
