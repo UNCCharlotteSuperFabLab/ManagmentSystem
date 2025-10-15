@@ -22,7 +22,7 @@ jobs:
             NINER_ENGAGE_TOKEN: ${{ secrets.NINER_ENGAGE_TOKEN }}
             NINER_ENGAGE_PAYLOAD_TOKEN: ${{ secrets.NINER_ENGAGE_PAYLOAD_TOKEN }}
             CANVAS_API_KEY: ${{ secrets.CANVAS_API_KEY }}
-            POSTGRESS_ROOT_PASSWORD: ${{ secrets.POSTGRESS_ROOT_PASSWORD }}
+            POSTGRES_ROOT_PASSWORD: ${{ secrets.POSTGRES_ROOT_PASSWORD }}
             BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
 
       run: |
@@ -34,7 +34,7 @@ jobs:
         NINER_ENGAGE_TOKEN: ${{ secrets.NINER_ENGAGE_TOKEN }}
         NINER_ENGAGE_PAYLOAD_TOKEN: ${{ secrets.NINER_ENGAGE_PAYLOAD_TOKEN }}
         CANVAS_API_KEY: ${{ secrets.CANVAS_API_KEY }}
-        POSTGRESS_ROOT_PASSWORD: ${{ secrets.POSTGRESS_ROOT_PASSWORD }}
+        POSTGRES_ROOT_PASSWORD: ${{ secrets.POSTGRES_ROOT_PASSWORD }}
 
       run: |
         for i in {1..60}; do
@@ -48,7 +48,7 @@ jobs:
         NINER_ENGAGE_TOKEN: ${{ secrets.NINER_ENGAGE_TOKEN }}
         NINER_ENGAGE_PAYLOAD_TOKEN: ${{ secrets.NINER_ENGAGE_PAYLOAD_TOKEN }}
         CANVAS_API_KEY: ${{ secrets.CANVAS_API_KEY }}
-        POSTGRESS_ROOT_PASSWORD: ${{ secrets.POSTGRESS_ROOT_PASSWORD }}
+        POSTGRES_ROOT_PASSWORD: ${{ secrets.POSTGRES_ROOT_PASSWORD }}
 
       run: |
         docker compose exec -T web python manage.py test
