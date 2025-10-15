@@ -11,8 +11,6 @@ from django.core.mail import send_mail
 from django.utils.timezone import now, localtime, timedelta
 
 
-
-
 from typing import Dict, Tuple
 
 from canvasapi import Canvas
@@ -60,6 +58,8 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
         null=True,
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])]
     )
+
+
     
     class SpaceLevel(models.IntegerChoices):
         USER = 0
@@ -82,7 +82,7 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
     objects = SpaceUserManager()
     
     def get_full_name(self) -> str:
-        return f"{self.first_name}, {self.last_name}"
+        return f"{self.first_name} {self.last_name}"
     
     def get_short_name(self) -> str:
         return f"{self.first_name}"
@@ -154,8 +154,44 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
         else:
             self.save()
             return self
+        
+    #function that returns the canvas id without emailing the user    
+        # This method attempts to retrieve and set the user's Canvas ID by matching their email with users in a specific Canvas course.
+        # Steps:
+        # 1. If the user already has a canvas_id, return self.
+        # 2. If the user does not have an email, return self.
+        # 3. If the email is not a charlotte.edu or uncc.edu address, return self.
+        # 4. Connect to the Canvas API using the API key from environment variables.
+        # 5. Get the specified course (hardcoded ID: 231237).
+        # 6. Iterate through all users in the course:
+        #    a. Get each user's profile.
+        #    b. Compare the primary email to the current user's email (charlotte.edu only).
+        #    c. If a match is found, set self.canvas_id to the Canvas profile ID and break.
+        # 7. Save the user and return self.
+    def get_canvas_id(self) -> SpaceUser:
+        from .tasks import canvas_user_list
+        print("getting canvas id")
+        if self.canvas_id:
+            canvas_user_list.update({self.canvas_id: self}) #add to the canvas user list
+            return self
+        if not self.email:
+            return self
+        if not (self.email.endswith("@charlotte.edu") or self.email.endswith("@uncc.edu")):
+            return self
+        canvas = Canvas("https://instructure.charlotte.edu", os.getenv("CANVAS_API_KEY"))
+        course = canvas.get_course(231237)
+        for couse_user in course.get_users():
+            couse_user: CanvasUser
+            profile = couse_user.get_profile()
+            email_address = self.email[:self.email.find("@")]
+            if profile["primary_email"] == f"{email_address}@charlotte.edu":
+                self.canvas_id = profile["id"]
+                canvas_user_list.update({self.canvas_id: self}) #add to the canvas user list
+                break
+        self.save()
+        return self    
 
-class KeyolderHistoryManager(models.Manager):
+class KeyholderHistoryManager(models.Manager):
     def get_current_keyholder(self) -> KeyholderHistory:
         return KeyholderHistory.objects.filter(exit_time__isnull=True).order_by('-start_time').first()
     def is_keyholder(self, user:SpaceUser) -> bool:
@@ -172,7 +208,7 @@ class KeyholderHistory(models.Model):
     keyholder = models.ForeignKey(SpaceUser, on_delete=models.CASCADE, related_name="keyholder_history")
     start_time = models.DateTimeField()
     exit_time = models.DateTimeField(null=True, blank=True)
-    objects = KeyolderHistoryManager()
+    objects = KeyholderHistoryManager()
     
     
 from visit_tracking.models import Visit
