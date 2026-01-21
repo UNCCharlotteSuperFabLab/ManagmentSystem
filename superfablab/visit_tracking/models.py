@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils.timezone import now, timedelta
 from users.tasks import canvas_update
 from users.models import SpaceUser
+from visit_tracking.nametag import Nametag
 
 class VisitManager(models.Manager):
     def get_signed_in_users(self):
@@ -25,6 +26,10 @@ class VisitManager(models.Manager):
                 #sign in
                 self.create(user=user, enter_time=now(), still_in_the_space=True)
                 canvas_update.delay(user.niner_id)
+                #insert thermal printer code here
+                new_tag = Nametag(user)
+                new_tag.build_nametag()
+                new_tag.print_nametag() 
 
             
         return user
@@ -36,6 +41,11 @@ class VisitManager(models.Manager):
         
         total_seconds = sum((visit.exit_time - visit.enter_time).total_seconds() for visit in visits)
         return total_seconds / 3600
+    
+    def create_nametag(self, user: SpaceUser):
+        from tools_and_trainings.models import Training
+        tag_name = SpaceUser.objects.get(niner_id=user.niner_id).get_full_name()
+        certifications = Training.objects.get_users_trainings(user)
 
 # Create your models here.
 class Visit(models.Model):

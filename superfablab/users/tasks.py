@@ -62,6 +62,11 @@ def canvas_quiz_status():
             "assignment": course.get_assignment(2691733),
             "category": TrainingCategory.objects.get(name="FDM Printing"),
         },
+        "Policies and Procedures": 
+        {
+            "assignment": course.get_quiz(6792318), #this is labelled as a quiz in Canvas for some reason?
+            "category": TrainingCategory.objects.get(name="Policies and Procedures"),
+        },
     }
 
     training_level = Training.TrainingLevels.APPRENTICE #always set to apprentice for automated ceritification
@@ -84,6 +89,9 @@ def canvas_quiz_status():
                 submissions = trainings[training]["assignment"].get_submission(user.canvas_id) #gets list of submissions for specific assignment
                 print(submissions)
                 training_category = trainings[training]['category']
+                if training_category == "Policies and Procedures":
+                    if submissions.grade < (100 * 7/8): #must score at least 87.5% on policies and procedures to be certified and get training
+                        continue
                 if submissions is None or training_category in user_training_categories:
                     continue #skip if no submissions or user already has training
                 if submissions.workflow_state == "ungraded" or submissions.grade is None:
