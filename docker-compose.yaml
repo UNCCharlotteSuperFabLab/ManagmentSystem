@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres
+    image: postgres:14 # Change number based on postgres version used in production
     restart: always
     container_name: db
     environment:
