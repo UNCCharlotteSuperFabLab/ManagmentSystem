@@ -37,6 +37,16 @@ def close_space(request):
             visit.still_in_the_space = False
             visit.exit_time = now()
             visit.save()
+
+        cache.set(
+        "leaderboard_of_shame",
+        {
+            "updated_at": now().isoformat(),
+            "rows": list(leaderboard_of_shame()),
+        },
+    timeout=None
+)
+
     return redirect('station:scan')
 
 def set_forgot(request):
@@ -151,7 +161,7 @@ def scan(request):
                     'first_keyholder_modal': first_keyholder_modal,
                     'current_keyholder_modal': current_keyholder_modal,
                     'weekly_hours':Visit.objects.get_hours_this_week(),
-                    'leaderboard_of_shame':leaderboard_of_shame(),
+                    'leaderboard_of_shame': cache.get("leaderboard_of_shame", []),
                     'user': user
                 }
                 return render(request, 'station.html', context)
@@ -215,7 +225,7 @@ def scan(request):
         'first_keyholder_modal': first_keyholder_modal,
         'current_keyholder_modal': current_keyholder_modal,
         'weekly_hours':Visit.objects.get_hours_this_week(),
-        'leaderboard_of_shame':leaderboard_of_shame(),
+        'leaderboard_of_shame': cache.get("leaderboard_of_shame", []),
         'user': user
     }
     return render(request, 'station.html', context)
