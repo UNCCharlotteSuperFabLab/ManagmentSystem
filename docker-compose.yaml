@@ -11,7 +11,7 @@ services:
     ports:
       - 5432:5432
     healthcheck:
-      test: ["CMD", "pg_isready  -d fablab -U postgres"]
+      test: ["CMD-SHELL", "pg_isready  -d fablab -U postgres"]
       interval: 10s
       retries: 10
       start_period: 60s  # Give it more time to start
