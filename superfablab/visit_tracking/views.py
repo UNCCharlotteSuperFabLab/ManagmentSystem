@@ -240,4 +240,4 @@ def new_user_form(request, niner_id):
         initial_data = {'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email} if user else {}
         form = NewUserForm(instance=user, initial=initial_data)
         
-    return render(request, 'new_user_form.html', initial_data)
+    return render(request, 'new_user_form.html', {'form': form})
