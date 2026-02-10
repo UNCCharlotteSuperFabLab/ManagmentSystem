@@ -1,0 +1,16 @@
+[Unit]
+Description=Management Docker Service
+After=docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=SFl
+WorkingDirectory=/home/anthony/SFL/ManagmentSystem
+ExecStart=/usr/bin/docker compose -f /home/SFL/ManagmentSystem/docker-compose.yaml up -d
+
+[Install]
+WantedBy=multi-user.target
+
