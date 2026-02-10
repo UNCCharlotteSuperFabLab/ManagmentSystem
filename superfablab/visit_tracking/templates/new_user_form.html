@@ -16,30 +16,23 @@
           <form method="post">
             {% csrf_token %}
 
-            <div class="field">
-              <label for="id_first_name" class="label is-text is-size-3">First Name</label>
-              <div class="control">
-                <input type="text" name="first_name" class="input is-text is-size-1"  required id="id_first_name" {% if first_name %} value="{{first_name}} {% endif %}" autofocus placeholder="Jane">
-              </div>
-            </div>  
+            {% for field in form %}
+              <div class="field">
+                <label class="label is-text is-size-3">
+                  {{ field.label }}
+                </label>
 
+                {% if field.errors %}
+                  <p class="help is-danger is-size-4">
+                    {{ field.errors.0 }}
+                  </p>
+                {% endif %}
 
-            <div class="field">
-              <label for="id_last_name" class="label is-text is-size-3">Last Name</label>
-              <div class="control">
-                <input type="text" name="last_name" class="input is-text is-size-1" required id="id_last_name" {% if last_name %} value="{{last_name}}" {% endif %} placeholder-"">
-              </div>
-            </div>
-
-
-            <div class="field">
-                <label for="id_email" class="label is-text is-size-3">@charlotte.edu email</label>
                 <div class="control">
-                  <input type="email" name="email" class="input is-text is-size-1" required id="id_email" {% if email %} value="{{ email }}" {% endif %} placeholder="jsmith@charlotte.edu" >
+                  {{ field }}
                 </div>
               </div>
-
-            
+            {% endfor %}
 
             <div class="field">
               <div class="control">

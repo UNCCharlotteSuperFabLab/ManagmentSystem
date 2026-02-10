@@ -118,12 +118,12 @@ def leaderboard_of_shame():
     return forgotten_signouts
 
 
-
-def send_canvas_invite(email: str, name: str):
-    subject = "Thanks for Visiting the Super Fab Lab"
-    html_content = f"<html><body><h1> Thanks for visiting the SFL {name}! </h1> <p> We hope you had an amazing time! Please click <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a> to join our canvas page and do trainings. Please also join our Discord <a href='https://discord.gg/Y3xxAqQDq3'> </p</body></html>"
-    to = [{"email":email,"name":name}]
-    # email.delay(to, subject, html_content)
+# commented due to deprication
+# def send_canvas_invite(email: str, name: str):
+#     subject = "Thanks for Visiting the Super Fab Lab"
+#     html_content = f"<html><body><h1> Thanks for visiting the SFL {name}! </h1> <p> We hope you had an amazing time! Please click <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a> to join our canvas page and do trainings. Please also join our Discord <a href='https://discord.gg/Y3xxAqQDq3'> </p</body></html>"
+#     to = [{"email":email,"name":name}]
+#     # email.delay(to, subject, html_content)
 
 def scan(request):
     # debug_task.delay()
@@ -242,13 +242,13 @@ def new_user_form(request, niner_id):
         # Bind form data to the user instance
         form = NewUserForm(request.POST, instance=user)
         if form.is_valid():
-            form.save()
+            user = form.save()
             Visit.objects.scan(niner_id)
-            send_canvas_invite(user.email, user.get_short_name())
+            user.send_canvas_invite()
             return redirect('station:scan')  # Redirect back to the station view
     else:
         # Provide initial data for the form
         initial_data = {'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email} if user else {}
         form = NewUserForm(instance=user, initial=initial_data)
         
-    return render(request, 'new_user_form.html', initial_data)
+    return render(request, 'new_user_form.html', {'form': form})
