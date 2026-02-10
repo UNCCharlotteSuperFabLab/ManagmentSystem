@@ -39,12 +39,12 @@ def close_space(request):
             visit.save()
 
         cache.set(
-        "leaderboard_of_shame",
-        {
-            "updated_at": now().isoformat(),
-            "rows": list(leaderboard_of_shame()),
-        },
-    timeout=None
+            "leaderboard_of_shame",
+            {
+                "updated_at": now().isoformat(),
+                "rows": list(leaderboard_of_shame()),
+            },
+        timeout=None
 )
 
     return redirect('station:scan')
@@ -148,6 +148,7 @@ def scan(request):
             barcodes = [int(barcode[i:i+9] for i in range(0, len(barcode), 9))]
             for barcode in barcodes:
                 user = Visit.objects.scan(barcode)
+                lb = cache.get("leaderboard_of_shame") or {}
                 context = {
                     'number_present': Visit.objects.filter(still_in_the_space=True).count(),
                     'unique_visitors_today': Visit.objects.filter(enter_time__range=(today_start, today_end)).distinct('user').count(),
@@ -161,7 +162,7 @@ def scan(request):
                     'first_keyholder_modal': first_keyholder_modal,
                     'current_keyholder_modal': current_keyholder_modal,
                     'weekly_hours':Visit.objects.get_hours_this_week(),
-                    'leaderboard_of_shame': cache.get("leaderboard_of_shame", []),
+                    'leaderboard_of_shame': lb.get("rows", []),
                     'user': user
                 }
                 return render(request, 'station.html', context)
@@ -211,7 +212,7 @@ def scan(request):
         last_activity=Coalesce('exit_time', 'enter_time')).filter(
         enter_time__range=(today_start, today_end)).order_by('-last_activity')[:10]
 
-
+    lb = cache.get("leaderboard_of_shame") or {}
     context = {
         'number_present': Visit.objects.filter(still_in_the_space=True).count(),
         'unique_visitors_today': Visit.objects.filter(enter_time__range=(today_start, today_end)).distinct('user').count(),
@@ -225,7 +226,7 @@ def scan(request):
         'first_keyholder_modal': first_keyholder_modal,
         'current_keyholder_modal': current_keyholder_modal,
         'weekly_hours':Visit.objects.get_hours_this_week(),
-        'leaderboard_of_shame': cache.get("leaderboard_of_shame", []),
+        'leaderboard_of_shame': lb.get("rows", []),
         'user': user
     }
     return render(request, 'station.html', context)
