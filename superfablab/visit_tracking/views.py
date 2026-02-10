@@ -15,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from .models import Visit
+from visit_tracking.nametag import Nametag
 from users.models import SpaceUser, KeyholderHistory
 from .forms import NewUserForm
 from .tasks import add
@@ -139,11 +140,11 @@ def scan(request):
     if request.method == 'POST' and 'barcode' in request.POST:
         barcode = request.POST['barcode']
         
-        if len(barcode) > 9:
+        if len(barcode) != 9:
             if len(barcode) % 9 != 0:
-                return render(request, "status/error.html", {'errror':'not an 800 number'}, status=406)
+                return render(request, "status/error.html", {'error':'Please enter a valid 800 number.'}, status=406)
             if current_keyholder is None:
-                return render(request, "status/error.html", {'error':'Need a keyholder to sign in first'}, status=400)
+                return render(request, "status/error.html", {'error':'Need a keyholder to sign in first.'}, status=400)
 
             barcodes = [int(barcode[i:i+9] for i in range(0, len(barcode), 9))]
             for barcode in barcodes:
@@ -199,6 +200,8 @@ def scan(request):
         else:
             print("scanning")
             user = Visit.objects.scan(barcode)
+            new_tag = Nametag(user)
+
 
         if redirect_val:
             return redirect(redirect_val)

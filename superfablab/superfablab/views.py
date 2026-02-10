@@ -135,12 +135,11 @@ def users_in_space(request):
     active_users = []
 
     for user in users_from_activity_logs:
-        active_users.append({"user": user, "method": "in_person", "trainings": Training.objects.get_users_trainings(user)})        
-
+        active_users.append({"user": user, "method": "in_person", "trainings": Training.objects.get_users_trainings(user)})
     context = {
         "active_users": active_users, 
         "keyholder": current_keyholder,
-        "all_trainings": TrainingCategory.objects.all().distinct()
+        "all_trainings": TrainingCategory.objects.all().distinct(),
     }
 
     return render(request, "users_in_space.html", context)
