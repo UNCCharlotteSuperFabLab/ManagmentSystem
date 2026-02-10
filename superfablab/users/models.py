@@ -147,7 +147,7 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
             html_content = f"<html><body><h1> Thanks for visiting the SFL {self.get_full_name()}! </h1> <p> We hope you had an amazing time! Please click <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a> to join our canvas page and do trainings </p</body></html>"
             to = [{"email":self.email,"name":self.get_full_name()}]
             # email.delay(to, subject, html_content)
-            send_mail(subject, "test", "super-fab-lab@c4glenn.com", [self.email], html_message=html_content)
+            send_mail(subject, "test", "welcome@charlottesuperfablab.space", [self.email], html_message=html_content)
 
             print("sending email")
             return self#Send email invite?
@@ -190,6 +190,27 @@ class SpaceUser(AbstractBaseUser, PermissionsMixin):
                 break
         self.save()
         return self    
+    
+    # send canvas invite email
+    def send_canvas_invite(self) -> None:
+        subject = "Join the Canvas Page for the Super Fab Lab"
+        html_content = f"""
+        <html>
+            <body>
+                <h1>Thanks for visiting the SFL {self.get_full_name()}!</h1>
+                <h2>
+                    Please click
+                    <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a>
+                    to join our canvas page and do trainings.
+                </h2>
+            </body>
+        </html>
+        """
+
+        send_mail(subject, "test", "welcome@charlottesuperfablab.space", [self.email], html_message=html_content)
+
+        print(f"Invite email sent to {self.email}")
+
 
 class KeyholderHistoryManager(models.Manager):
     def get_current_keyholder(self) -> KeyholderHistory:
