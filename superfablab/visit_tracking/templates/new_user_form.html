@@ -31,15 +31,21 @@
               </div>
             </div>
 
-
-            <div class="field">
-                <label for="id_email" class="label is-text is-size-3">@charlotte.edu email</label>
                 <div class="control">
-                  <input type="email" name="email" class="input is-text is-size-1" required id="id_email" pattern="^[A-Za-z0-9._%+-]+@charlotte\.edu$" title="Email must end with @charlotte.edu" {% if email %} value="{{ email }}" {% endif %} placeholder="jsmith@charlotte.edu" oninput="this.setCustomValidity('')">
+                  <input type="email" 
+                         name="email" 
+                         class="input is-text is-size-1" 
+                         required id="id_email" 
+                         pattern="^[A-Za-z0-9._%+-]+@charlotte\.edu$" 
+                         title="Email must end with @charlotte.edu" 
+                         {% if email %} 
+                          value="{{ email }}" 
+                         {% endif %} 
+                         placeholder="jsmith@charlotte.edu" 
+                         oninput="this.setCustomValidity('')">
                 </div>
               </div>
-
-            
+            {% endfor %}
 
             <div class="field">
               <div class="control">
