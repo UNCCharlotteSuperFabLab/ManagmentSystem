@@ -1,5 +1,6 @@
 #!/bin/bash
 systemctl disable management.service
+docker compose down
 if ! -e /etc/systemd/system/management.service; then
     rm /etc/systemd/system/management.service
 fi

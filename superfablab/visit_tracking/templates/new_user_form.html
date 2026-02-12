@@ -19,7 +19,7 @@
             <div class="field">
               <label for="id_first_name" class="label is-text is-size-3">First Name</label>
               <div class="control">
-                <input type="text" name="first_name" class="input is-text is-size-1"  required id="id_first_name" {% if first_name %} value="{{first_name}} {% endif %}" autofocus placeholder="Jane">
+                <input type="text" name="first_name" class="input is-text is-size-1" required id="id_first_name" pattern="^[^0-9]+$" title="First name cannot contain numbers" {% if first_name %} value="{{first_name}}" {% endif %} autofocus placeholder="Jane" oninput="this.setCustomValidity('')">
               </div>
             </div>  
 
@@ -27,20 +27,26 @@
             <div class="field">
               <label for="id_last_name" class="label is-text is-size-3">Last Name</label>
               <div class="control">
-                <input type="text" name="last_name" class="input is-text is-size-1" required id="id_last_name" {% if last_name %} value="{{last_name}}" {% endif %} placeholder="Smith">
+                <input type="text" name="last_name" class="input is-text is-size-1" required id="id_last_name" pattern="^[^0-9]+$" title="Last name cannot contain numbers" {% if last_name %} value="{{last_name}}" {% endif %} placeholder="Smith" oninput="this.setCustomValidity('')">
               </div>
             </div>
 
-
-            <div class="field">
-                <label for="id_email" class="label is-text is-size-3">@charlotte.edu email</label>
                 <div class="control">
-                  <input type="email" name="email" class="input is-text is-size-1" required id="id_email" {% if email %} value="{{ email }}" {% endif %} placeholder="jsmith@charlotte.edu" >
+                  <label for="id_email" class="label is-text is-size-3">Email</label>
+                  <input type="email" 
+                         name="email" 
+                         class="input is-text is-size-1" 
+                         required id="id_email" 
+                         pattern="^[A-Za-z0-9._%+-]+@charlotte\.edu$" 
+                         title="Email must end with @charlotte.edu" 
+                         {% if email %} 
+                          value="{{ email }}" 
+                         {% endif %} 
+                         placeholder="jsmith@charlotte.edu" 
+                         oninput="this.setCustomValidity('')">
                 </div>
               </div>
-
-            
-
+        
             <div class="field">
               <div class="control">
                 <button type="submit" class="button is-primary is-fullwidth">Enter SFL</button>
@@ -52,4 +58,29 @@
     </div>
   </div>
 </section>
+<script>
+  (function(){
+    var reDigits = /\d/;
+    var reEmail = /@charlotte\.edu\s*$/i;
+    var first = document.getElementById('id_first_name');
+    var last = document.getElementById('id_last_name');
+    var email = document.getElementById('id_email');
+    function validate(el, msg, test){
+      if(!el) return;
+      el.addEventListener('input', function(){
+        if(test(el.value)){
+          el.setCustomValidity(msg);
+        } else {
+          el.setCustomValidity('');
+        }
+      });
+      if(test(el.value)){
+        el.setCustomValidity(msg);
+      }
+    }
+    validate(first, 'Name cannot contain numbers', function(v){ return reDigits.test(v); });
+    validate(last, 'Name cannot contain numbers', function(v){ return reDigits.test(v); });
+    validate(email, 'Email must end with @charlotte.edu', function(v){ return !reEmail.test((v||'').trim()); });
+  })();
+</script>
 {% endblock %}

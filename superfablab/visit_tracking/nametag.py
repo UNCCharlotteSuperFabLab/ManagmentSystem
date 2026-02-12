@@ -8,6 +8,7 @@ TEMPLATES_DIR = os.path.join(settings.BASE_DIR, "visit_tracking", "templates")
 def tpl_path(name: str) -> str:
     return os.path.join(TEMPLATES_DIR, name)
 
+
 class Nametag:
     full_name: str
     certifications: list
@@ -16,6 +17,16 @@ class Nametag:
         from tools_and_trainings.models import Training
         self.full_name = user.get_full_name()
         self.certifications = Training.objects.get_users_trainings(user)
+
+    
+
+    def is_printer_online(self, ip: str, port: int = 9100, timeout: float = 1.0) -> bool:
+        import socket
+        try:
+            with socket.create_connection((ip, port), timeout=timeout):
+                return True
+        except (socket.timeout, OSError):
+            return False
 
     def build_nametag(self):
         # Placeholder for nametag building logic
@@ -94,6 +105,9 @@ class Nametag:
         im = im.convert("L")
 
         printer_ip = "10.147.138.174"
+        if not self.is_printer_online(printer_ip):
+            print("Printer is offline — skipping print job.")
+            return
 
         target_height = 696
 
@@ -136,5 +150,7 @@ class Nametag:
                 cut=True
 
         )
-
-        send(instructions=instructions, printer_identifier=printer, backend_identifier=backend, blocking=True)
+        try:
+            send(instructions=instructions, printer_identifier=printer, backend_identifier=backend, blocking=True)
+        except Exception as e:
+            print("Operation took longer than 2 seconds - aborting: ", e)

@@ -5,13 +5,14 @@ from users.tasks import canvas_update
 from users.models import SpaceUser
 from visit_tracking.nametag import Nametag
 
-class VisitManager(models.Manager):
+class VisitManager(models.Manager):   
     def get_signed_in_users(self):
         return SpaceUser.objects.filter(
             visit__still_in_the_space=True
         ).distinct()
     
     def scan(self, niner_id:int):
+
         user, created = SpaceUser.objects.get_or_create(niner_id=niner_id)
         with transaction.atomic():
             active_vist = self.filter(user=user, still_in_the_space=True).first()
@@ -29,7 +30,11 @@ class VisitManager(models.Manager):
                 #insert thermal printer code here
                 new_tag = Nametag(user)
                 new_tag.build_nametag()
-                new_tag.print_nametag() 
+                new_tag.print_nametag()
+
+
+
+
 
             
         return user
@@ -60,3 +65,5 @@ class Visit(models.Model):
     @property
     def description(self):
         return f"IN" if self.still_in_the_space else "OUT"
+    
+

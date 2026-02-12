@@ -15,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from .models import Visit
+from visit_tracking.nametag import Nametag
 from users.models import SpaceUser, KeyholderHistory
 from .forms import NewUserForm
 from .tasks import add
@@ -37,6 +38,16 @@ def close_space(request):
             visit.still_in_the_space = False
             visit.exit_time = now()
             visit.save()
+
+        cache.set(
+            "leaderboard_of_shame",
+            {
+                "updated_at": now().isoformat(),
+                "rows": list(leaderboard_of_shame()),
+            },
+        timeout=None
+)
+
     return redirect('station:scan')
 
 def set_forgot(request):
@@ -108,12 +119,12 @@ def leaderboard_of_shame():
     return forgotten_signouts
 
 
-
-def send_canvas_invite(email: str, name: str):
-    subject = "Thanks for Visiting the Super Fab Lab"
-    html_content = f"<html><body><h1> Thanks for visiting the SFL {name}! </h1> <p> We hope you had an amazing time! Please click <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a> to join our canvas page and do trainings. Please also join our Discord <a href='https://discord.gg/Y3xxAqQDq3'> </p</body></html>"
-    to = [{"email":email,"name":name}]
-    # email.delay(to, subject, html_content)
+# commented due to deprication
+# def send_canvas_invite(email: str, name: str):
+#     subject = "Thanks for Visiting the Super Fab Lab"
+#     html_content = f"<html><body><h1> Thanks for visiting the SFL {name}! </h1> <p> We hope you had an amazing time! Please click <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a> to join our canvas page and do trainings. Please also join our Discord <a href='https://discord.gg/Y3xxAqQDq3'> </p</body></html>"
+#     to = [{"email":email,"name":name}]
+#     # email.delay(to, subject, html_content)
 
 def scan(request):
     # debug_task.delay()
@@ -129,15 +140,16 @@ def scan(request):
     if request.method == 'POST' and 'barcode' in request.POST:
         barcode = request.POST['barcode']
         
-        if len(barcode) > 9:
+        if len(barcode) != 9:
             if len(barcode) % 9 != 0:
-                return render(request, "status/error.html", {'errror':'not an 800 number'}, status=406)
+                return render(request, "status/error.html", {'error':'Please enter a valid 800 number.'}, status=406)
             if current_keyholder is None:
-                return render(request, "status/error.html", {'error':'Need a keyholder to sign in first'}, status=400)
+                return render(request, "status/error.html", {'error':'Need a keyholder to sign in first.'}, status=400)
 
             barcodes = [int(barcode[i:i+9] for i in range(0, len(barcode), 9))]
             for barcode in barcodes:
                 user = Visit.objects.scan(barcode)
+                lb = cache.get("leaderboard_of_shame") or {}
                 context = {
                     'number_present': Visit.objects.filter(still_in_the_space=True).count(),
                     'unique_visitors_today': Visit.objects.filter(enter_time__range=(today_start, today_end)).distinct('user').count(),
@@ -151,7 +163,7 @@ def scan(request):
                     'first_keyholder_modal': first_keyholder_modal,
                     'current_keyholder_modal': current_keyholder_modal,
                     'weekly_hours':Visit.objects.get_hours_this_week(),
-                    'leaderboard_of_shame':leaderboard_of_shame(),
+                    'leaderboard_of_shame': lb.get("rows", []),
                     'user': user
                 }
                 return render(request, 'station.html', context)
@@ -188,6 +200,8 @@ def scan(request):
         else:
             print("scanning")
             user = Visit.objects.scan(barcode)
+            new_tag = Nametag(user)
+
 
         if redirect_val:
             return redirect(redirect_val)
@@ -201,7 +215,7 @@ def scan(request):
         last_activity=Coalesce('exit_time', 'enter_time')).filter(
         enter_time__range=(today_start, today_end)).order_by('-last_activity')[:10]
 
-
+    lb = cache.get("leaderboard_of_shame") or {}
     context = {
         'number_present': Visit.objects.filter(still_in_the_space=True).count(),
         'unique_visitors_today': Visit.objects.filter(enter_time__range=(today_start, today_end)).distinct('user').count(),
@@ -215,7 +229,7 @@ def scan(request):
         'first_keyholder_modal': first_keyholder_modal,
         'current_keyholder_modal': current_keyholder_modal,
         'weekly_hours':Visit.objects.get_hours_this_week(),
-        'leaderboard_of_shame':leaderboard_of_shame(),
+        'leaderboard_of_shame': lb.get("rows", []),
         'user': user
     }
     return render(request, 'station.html', context)
@@ -231,13 +245,13 @@ def new_user_form(request, niner_id):
         # Bind form data to the user instance
         form = NewUserForm(request.POST, instance=user)
         if form.is_valid():
-            form.save()
+            user = form.save()
             Visit.objects.scan(niner_id)
-            send_canvas_invite(user.email, user.get_short_name())
+            user.send_canvas_invite()
             return redirect('station:scan')  # Redirect back to the station view
     else:
         # Provide initial data for the form
         initial_data = {'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email} if user else {}
         form = NewUserForm(instance=user, initial=initial_data)
         
-    return render(request, 'new_user_form.html', initial_data)
+    return render(request, 'new_user_form.html', {'form': form})
