@@ -88,6 +88,8 @@
             id="member_id" 
             type="hidden" 
             name="barcode"
+            pattern="^(80(1|0))([0-9]{6})$"
+            maxlength="9"
             value="{{user.niner_id}}"/>
             <input type="submit" class="button" value="Don't Take Over">
           </form>  
@@ -181,7 +183,7 @@
           <!-- Member ID Form -->
           <div class="column is-one-fifth">
             <div id="member_id_div" class="box">
-              <form action="{% url 'station:scan' %}" method="post">
+              <form action="{% url 'station:scan' %}" method="post" id="member_id_form">
                 {% csrf_token %}
                 <div class="field">
                   <div id="member-id-control" class="control">
@@ -203,10 +205,15 @@
                     <input 
                       id="member_id" 
                       class="input" 
-                      type="number" 
+                      type="text" 
                       name="barcode" 
                       autofocus 
-                      placeholder="Member ID" />
+                      pattern="^(80(1|0))([0-9]{6})$"
+                      maxlength="9"
+                      placeholder="Member ID" 
+                      oninput="this.setCustomValidity('')"
+                      required
+                      />
                   </div>
                 </div>
               </form>
@@ -317,9 +324,24 @@
   }  
   const form = document.querySelector('form');
   const memberIdInput = document.getElementById('member-id-control');
+  const input = document.getElementById("member_id");
   
-  form.addEventListener('submit', function() {
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    if(input.validity.patternMismatch){
+        alert("Please input a valid 800 number");
+        input.value = "";
+        return;
+    } else if(input.validity.tooLong) {
+        alert("This input is too long");
+        input.value = "";
+        return;
+    } else if(input.validity.valueMissing){
+        alert("This field must have a number");
+        return;
+    }
     toggleLoadingIndicator(true);
+    form.submit();
   });
 </script>
 
