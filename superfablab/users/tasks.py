@@ -64,7 +64,7 @@ def canvas_quiz_status():
         },
         "Policies and Procedures": 
         {
-            "assignment": course.get_quiz(6792318), #this is labelled as a quiz in Canvas for some reason?
+            "assignment": course.get_quiz(556178), #this is labelled as a quiz in Canvas for some reason?
             "category": TrainingCategory.objects.get(name="Policies and Procedures"),
         },
     }
@@ -86,23 +86,34 @@ def canvas_quiz_status():
         for training in trainings: #iterate through each training defined above
             print(training)
             try:
-                submissions = trainings[training]["assignment"].get_submission(user.canvas_id) #gets list of submissions for specific assignment
-                print(submissions)
                 training_category = trainings[training]['category']
-                if training_category == "Policies and Procedures":
-                    if submissions.grade < (100 * 7/8): #must score at least 87.5% on policies and procedures to be certified and get training
+                if training == "Policies and Procedures":
+                    quiz = trainings[training]["assignment"]
+                    submissions = quiz.get_submissions()
+                    submission = next(
+                        (s for s in submissions if s.user_id == user.canvas_id),
+                        None
+                    )
+                else:
+                    submission = trainings[training]["assignment"].get_submission(user.canvas_id) #gets list of submissions for specific assignment
+                print(submission)
+                
+                if training == "Policies and Procedures":
+                    if submission is None:
                         continue
-                if submissions is None or training_category in user_training_categories:
-                    continue #skip if no submissions or user already has training
-                if submissions.workflow_state == "ungraded" or submissions.grade is None:
-                    continue #skip if submission is ungraded or missing
+                    if submission.score < 7: #must score at least 87.5% on policies and procedures to be certified and get training
+                        continue
+                else:
+                    if submission is None or training_category in user_training_categories:
+                        continue #skip if no submissions or user already has training
+                    if submission.workflow_state == "ungraded" or submission.grade is None:
+                        continue #skip if submission is ungraded or missing
                 create_training_internal(user, training_category, training_level, certifier) #create orientation training for user
                 print(f"Awarded {training} training to {user.get_full_name()}")
             except Exception:
                     print(f"Error processing training {training} for user {user.get_full_name()}: unable to find canvas id for submission. Skipping.")
                     continue
                 
-            
     
     print("Canvas quiz status check complete.")      
 
