@@ -99,7 +99,7 @@ def canvas_quiz_status():
                 print(submission)
                 
                 if training == "Policies and Procedures":
-                    if submission is None:
+                    if submission is None or training_category in user_training_categories:
                         continue
                     if submission.score < 7: #must score at least 87.5% on policies and procedures to be certified and get training
                         continue
