@@ -19,7 +19,7 @@ services:
 
  
   adminer:
-    image: adminer
+    image: adminer #Adminer is a database admin interface used to interact manually with the database
     restart: always
     ports:
       - 8080:8080

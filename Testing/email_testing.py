@@ -5,6 +5,8 @@ from brevo_python.rest import ApiException
 from pprint import pprint
 import dotenv
 
+#MORE RESEARCH IS REQUIRED ON THIS AS IT APPEARS BREVO IS NOT USED
+#IN THIS CODEBASE, Instead this codebase used Django mail
 
 brevo_api_key = dotenv.dotenv_values()["BREVO_API_KEY"]
 print(brevo_api_key)
@@ -34,8 +36,8 @@ except ApiException as e:
 transactional_instance = brevo_python.TransactionalEmailsApi(api_client)
 subject = "Thanks for Visiting the Super Fab Lab"
 html_content = "<html><body><h1> Thanks for visiting the SFL Today! </h1> <p> We hope you had an amazing time! Please click <a href='https://uncc.instructure.com/enroll/E6NPBA'>this link</a> to join our canvas page and do trainings </p</body></html>"
-sender = {"name":"Super Fab Lab","email":"super-fab-lab@c4glenn.com"}
-to = [{"email":"psmit145@charlotte.edu","name":"Tano Edwards"}]
+sender = {"name":"Super Fab Lab","email":"welcome@charlottesuperfablab.space"}
+to = [{"email":"adibern2@charlotte.edu","name":"Anthony DiBernardo"}]
 send_smtp_email = brevo_python.SendSmtpEmail(to=to, html_content=html_content, sender=sender, subject=subject)
 
 

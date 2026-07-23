@@ -1,9 +1,9 @@
 from PIL import Image, ImageEnhance, ImageDraw, ImageFont
 
-image = Image.open('sfl-id-template.png')
+image = Image.open('../superfablab/visit_tracking/templates/sfl-id-template.png')
 max_length = 790
 size = 90
-font_path = "arial.ttf"
+font_path = "../Fonts/arial.ttf"
 draw = ImageDraw.Draw(image)
 text = "Bayli Wolfe"
 icon_1_pos = (248, 395)
@@ -17,27 +17,27 @@ icon_8_pos = (0, 0)
 
 cert_icons_list = {
     "Policies and Procedures": {
-        "img": "policies-icon.png",
+        "img": "../superfablab/visit_tracking/templates/policies-icon.png",
         "position": icon_1_pos
     },
     "Orientation": {
-        "img": "orientation-icon.png",
+        "img": "../superfablab/visit_tracking/templates/orientation-icon.png",
         "position": icon_2_pos
     },
     "3D Printer": {
-        "img": "3d-printer-icon.png",
+        "img": "../superfablab/visit_tracking/templates/3d-printer-icon.png",
         "position": icon_3_pos
     },
     "Laser Cutter": {
-        "img": "laser-cutter-icon.png",
+        "img": "../superfablab/visit_tracking/templates/laser-cutter-icon.png",
         "position": icon_4_pos
     },
     "Resin Printer": {
-        "img": "resin-printer-icon.png",
+        "img": "../superfablab/visit_tracking/templates/resin-printer-icon.png",
         "position": icon_5_pos
     },
     "Waterjet": {
-        "img": "waterjet-icon.png",
+        "img": "../superfablab/visit_tracking/templates/waterjet-icon.png",
         "position": icon_6_pos
     },
     
