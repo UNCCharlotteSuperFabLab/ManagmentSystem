@@ -22,6 +22,7 @@ from .tasks import add
 from superfablab.celery import debug_task
 from users.tasks import check_for_needed_invites
 
+#This code closes the space and updates the leaderboard of shame, it also sets all users still in the space on close to forgot
 def close_space(request):
     if request.method == 'POST' and 'barcode' in request.POST:
         keyholder = KeyholderHistory.objects.get_current_keyholder()
@@ -49,7 +50,7 @@ def close_space(request):
 )
 
     return redirect('station:scan')
-
+#Sets the user to forgot then redirects to station/scan
 def set_forgot(request):
     if request.method == 'POST' and 'barcode' in request.POST:
         barcode = request.POST['barcode']
@@ -97,7 +98,7 @@ def assign_keyholder(user, request):
         Visit.objects.filter(user=current_keyholder, still_in_the_space=True).update(still_in_the_space=False, exit_time=now())
     
     return redirect('station:scan')
-
+#This code handles the leaderboard of shame as shown in the bottom right of the station
 def leaderboard_of_shame():
     forgotten_signouts = (
         Visit.objects
@@ -126,6 +127,9 @@ def leaderboard_of_shame():
 #     to = [{"email":email,"name":name}]
 #     # email.delay(to, subject, html_content)
 
+#Checks if there is a keyholder signed in, if there is not it returns an error requiring a keyholder, it also checks the 
+#800 number to ensure it is valid, If the user is a higher priority keyholder then it will ask if they want to take over
+# Finally it signs the user in assuming there is a keyholder and renders station.html
 def scan(request):
     # debug_task.delay()
     # check_for_needed_invites.delay()
@@ -234,7 +238,7 @@ def scan(request):
     }
     return render(request, 'station.html', context)
 
-
+# renders the new_user_form and uses the forms.py form for logic, it then signs in the user assuming the information is correct
 def new_user_form(request, niner_id):
     # Fetch the user or create a placeholder
     user = SpaceUser.objects.filter(niner_id=niner_id).first()

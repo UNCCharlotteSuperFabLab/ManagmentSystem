@@ -3,7 +3,7 @@ from django.test import TestCase
 from .models import SpaceUser
 
 
-# Create your tests here.
+# This test checks if the canvas id is not null for a known user
 class SpaceUserModelTests(TestCase):
     def __init__(self, methodName = "runTest"):
         super().__init__(methodName)

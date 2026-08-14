@@ -13,21 +13,27 @@ from users.models import KeyholderHistory
 from visit_tracking.models import Visit
 from tools_and_trainings.models import Training, TrainingCategory
 
-
+#Checks whether users are staff based on space level
 def staff_required(view_func):
     return user_passes_test(lambda u: u.space_level >= get_user_model().SpaceLevel.KEYHOLDER)(view_func)
 
+#checks whether users are allowed to open the space based on space level
 def open_required(view_func):
     return user_passes_test(lambda u: u.space_level >= get_user_model().SpaceLevel.VOLUNTEER)(view_func)
 
+
 def index(request):
     context ={
+        #defines the context of whether a user can open based on space level and checks the user is not anonymous
         'user_can_open_space': not request.user.is_anonymous and request.user.space_level >= get_user_model().SpaceLevel.VOLUNTEER,
+        #defines the context of whether a user can train others based on whether the user has a training level greater than or equal to trainer
         'user_can_train': not request.user.is_anonymous and Training.objects.filter(user=request.user, training_level__gte=Training.TrainingLevels.TRAINER).exists(),
 
     }
+    #renders the index.html page with the above context
     return render(request, 'index.html', context)
 
+#renders the profile.html page and grabs the information required to fill it out
 def profile(request):
     visits = Visit.objects.filter(user__niner_id=request.user.niner_id).order_by('-enter_time')
         
@@ -41,9 +47,11 @@ def profile(request):
     
     return render(request, 'profile.html', context)
 
+#renders the coming soon page
 def coming_soon(request):
     return render(request, 'coming_soon.html')
 
+#grabs the highest amount of unique visitors and renders the stats page
 def stats(request):
     visits_by_day = (
         Visit.objects
@@ -62,7 +70,7 @@ def stats(request):
         'highest_unique': busiest
     }
     return render(request, 'stats.html', context)
-
+#adds to the stats page with a users per day, average length of stay, total time in the lab, and average visits per user chart
 def users_per_day_chart(request):
     visits_by_day = (
         Visit.objects
@@ -125,7 +133,7 @@ def users_per_day_chart(request):
     
     return JsonResponse(data)
 
-
+#Requires the space to be open and if it is renders active_users, the keyholder, and all trainings using the users_in_space template
 @open_required
 def users_in_space(request):
     current_keyholder = KeyholderHistory.objects.get_current_keyholder()

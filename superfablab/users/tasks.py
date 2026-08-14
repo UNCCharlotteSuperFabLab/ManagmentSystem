@@ -3,7 +3,7 @@ from .models import SpaceUser
 from canvasapi import Canvas
 import os
 from tools_and_trainings.models import Training, TrainingCategory, TrainingManager
-
+#This function checks all the canvas ids that exists in the database and returns the user and their trainings
 def build_canvas_user_list():
     global canvas_user_list
     canvas_user_list = {}
@@ -15,6 +15,8 @@ def build_canvas_user_list():
         }
     print("Built canvas user list: \n", canvas_user_list)
 
+#This shared task checks for any user that needs canvas invites and prints it to the screen of the server
+#This code does not seem to have any point outside of testing
 @shared_task
 def check_for_needed_invites():
     # Your task logic here
@@ -23,7 +25,8 @@ def check_for_needed_invites():
     for user in users:
         user.get_canvas_id_from_canvas()
         print(f"{user.get_full_name} - {user.canvas_id}")
-        
+
+#This gets the canvas id from SpaceUser and does nothing with it
 @shared_task
 def canvas_update(niner_id: int):
     SpaceUser.objects.get(niner_id=niner_id).get_canvas_id_from_canvas()
