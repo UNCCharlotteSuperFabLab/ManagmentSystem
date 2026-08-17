@@ -21,7 +21,7 @@ psycopg2-binary #PostgreSQL database driver
 redis==5.2.1 #Redis client acting as a broker and result backend for Celery
 requests==2.32.3 #The HTTP requests library
 six==1.17.0 #Python 2 and 3 compatibility util
-sqlparse==0.5.3 #SQL parsing for Django
+sqlparse==0.6.0 #SQL parsing for Django
 tzdata==2024.2 #Timezone database provider for Django
 urllib3==2.2.3 #HTTP client library
 vine==5.1.0 #Promise execution library for Celery
