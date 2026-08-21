@@ -26,7 +26,7 @@ tzdata==2024.2 #Timezone database provider for Django
 urllib3==2.2.3 #HTTP client library
 vine==5.1.0 #Promise execution library for Celery
 wcwidth==0.2.13 #Terminal character width formatting for prompt_toolkit
-pillow==12.0.0 #Imaging library used to layout nametag graphics
+pillow==12.3.0 #Imaging library used to layout nametag graphics
 django-celery-beat==2.7.0 #Database-backed task scheduler for Celery
 django-anymail==12.0 #Transactional email service provider for Django
 django-debug-toolbar==5.1.0 #Development panel for Django
