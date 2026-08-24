@@ -88,7 +88,7 @@
             id="member_id" 
             type="hidden" 
             name="barcode"
-            pattern="^(80(1|0))([0-9]{6})$"
+            pattern="^(80(2|1|0))([0-9]{6})$"
             maxlength="9"
             value="{{user.niner_id}}"/>
             <input type="submit" class="button" value="Don't Take Over">
@@ -208,7 +208,7 @@
                       type="text" 
                       name="barcode" 
                       autofocus 
-                      pattern="^(80(1|0))([0-9]{6})$"
+                      pattern="^(80(2|1|0))([0-9]{6})$"
                       maxlength="9"
                       placeholder="Member ID" 
                       oninput="this.setCustomValidity('')"
