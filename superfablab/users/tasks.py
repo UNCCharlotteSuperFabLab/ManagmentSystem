@@ -44,27 +44,27 @@ def canvas_quiz_status():
         },
         "Resin Printing":
         {
-            "assignment": course.get_assignment(2691739),
+            "assignment": course.get_assignment(2558215),
             "category": TrainingCategory.objects.get(name="Resin Printing"),
         },
         "Waterjet": 
         {
-            "assignment": course.get_assignment(2694817),
+            "assignment": course.get_assignment(2601713),
             "category": TrainingCategory.objects.get(name="Waterjet"),
         },
         "Laser Cutter": 
         {
-            "assignment": course.get_assignment(2694816),
+            "assignment": course.get_assignment(2547139),
             "category": TrainingCategory.objects.get(name="Laser Cutter"),
         },
         "3D Printer": 
         {
-            "assignment": course.get_assignment(2691733),
+            "assignment": course.get_assignment(2577249),
             "category": TrainingCategory.objects.get(name="FDM Printing"),
         },
         "Policies and Procedures": 
         {
-            "assignment": course.get_quiz(6792318), #this is labelled as a quiz in Canvas for some reason?
+            "assignment": course.get_quiz(556178), #this is labelled as a quiz in Canvas for some reason?
             "category": TrainingCategory.objects.get(name="Policies and Procedures"),
         },
     }
