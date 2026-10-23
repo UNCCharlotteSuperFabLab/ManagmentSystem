@@ -3,7 +3,7 @@ asgiref==3.8.1 #Asynchronous Server Gateway Interface service for Django
 billiard==4.2.1 #Part of Celery to help with parallelism
 canvasapi==3.3.0 #The Canvas API wrapper
 celery==5.4.0 #A library for an async tasks used for email sending
-certifi==2024.12.14 #Certificate provider
+certifi==2026.10.19 #Certificate provider
 charset-normalizer==3.4.0 #Encoding detector used by requests
 click==8.1.7 #CLI framework for Celery
 click-didyoumean==0.3.1 #Click CLI extension for subcommand auto-suggestions in Celery
