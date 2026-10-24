@@ -12,7 +12,7 @@ click-repl==0.3.0 #Click CLI extension for interactive REPL shell execution
 Django==5.1.4 #Primary web server framework
 django-allauth==65.3.0 #Auth package for Django
 django-filter==23.1 #Filtering Engine
-djangorestframework==3.15.2 #Toolkit for REST APIs
+djangorestframework==3.18.2 #Toolkit for REST APIs
 idna==3.10 #Domain name handling
 kombu==5.4.2 #Messaging transport framework for Celery
 prompt_toolkit==3.0.48 #CLI prompt component for click-repl
